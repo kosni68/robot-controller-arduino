@@ -3,8 +3,8 @@
 #include "printf.h"
 #include <EEPROM.h>
 
-#define VERSION 1.01
-#define value_to_init_eeprom 145 //change this value to erase default eeprom
+#define VERSION "1.0.1"
+#define value_to_init_eeprom 144 //change this value to erase default eeprom
 
 // ***********************************************************************
 // ********************     VARIABLES GLOBALES     ***********************
@@ -56,7 +56,7 @@ const byte button_mask_select = 0x20;
 const byte button_mask_joystick = 0x40;
 
 // ***********************************************************************
-// ***********************     FONCTION SETUP     ************************
+// ***********************     FUNCTION SETUP     ************************
 // ***********************************************************************
 
 void setup()
@@ -83,7 +83,7 @@ void setup()
 }
 
 // ***********************************************************************
-// ***********************     FONCTION LOOP     *************************
+// ***********************     FUNCTION LOOP     *************************
 // ***********************************************************************
 
 void loop()
@@ -147,8 +147,8 @@ void read_joystick()
 
   if (correction_scale)
   {
-    joystate.speed_send = echelle(speed_read, speed_min, speed_middle, speed_max);
-    joystate.steer_send = echelle(steer_read, steer_min, steer_middle, steer_max);
+    joystate.speed_send = scaling(speed_read, speed_min, speed_middle, speed_max);
+    joystate.steer_send = scaling(steer_read, steer_min, steer_middle, steer_max);
   }
   else
   {
@@ -248,10 +248,10 @@ int calibration_auto()
 }
 
 // ***********************************************************************
-// ***********************    MISE A LECHELLE    *************************
+// ***************************    SCALING    *****************************
 // ***********************************************************************
 
-int echelle(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max)
+int scaling(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max)
 {
   int valeur_retournee;
   int zero = 0;
@@ -474,6 +474,7 @@ void variable_default()
   PIN_joystick_steer = 16;
   inverse_speed = 0;
   inverse_steer = 0;
+  inverse_send_speed_steer = 0;
   correction_scale = 0;
   speed_min = 0;
   speed_middle = 512;
@@ -485,30 +486,83 @@ void variable_default()
 
 void save_eeprom()
 {
-  EEPROM.put(1, PIN_joystick_speed);
-  EEPROM.put(2, PIN_joystick_steer);
-  EEPROM.put(3, inverse_speed);
-  EEPROM.put(4, inverse_steer);
-  EEPROM.put(5, correction_scale);
-  EEPROM.put(6, speed_min);
-  EEPROM.put(8, speed_middle);
-  EEPROM.put(10, speed_max);
-  EEPROM.put(12, steer_min);
-  EEPROM.put(14, steer_middle);
-  EEPROM.put(16, steer_max);
+  byte byte_position = 1;
+
+  EEPROM.put(byte_position, PIN_joystick_speed);
+  byte_position+=sizeof(PIN_joystick_speed);
+
+  EEPROM.put(byte_position, PIN_joystick_steer);
+  byte_position+=sizeof(PIN_joystick_steer);
+
+  EEPROM.put(byte_position, inverse_speed);
+  byte_position+=sizeof(inverse_speed);
+
+  EEPROM.put(byte_position, inverse_steer);
+  byte_position+=sizeof(inverse_steer);
+
+  EEPROM.put(byte_position, correction_scale);
+  byte_position+=sizeof(correction_scale);
+
+  EEPROM.put(byte_position, inverse_send_speed_steer);
+  byte_position+=sizeof(inverse_send_speed_steer);
+
+  EEPROM.put(byte_position, speed_min);
+  byte_position+=sizeof(speed_min);
+
+  EEPROM.put(byte_position, speed_middle);
+  byte_position+=sizeof(speed_middle);
+
+  EEPROM.put(byte_position, speed_max);
+  byte_position+=sizeof(speed_max);
+
+  EEPROM.put(byte_position, steer_min);
+  byte_position+=sizeof(steer_min);
+
+  EEPROM.put(byte_position, steer_middle);
+  byte_position+=sizeof(steer_middle);
+
+  EEPROM.put(byte_position, steer_max);
+  byte_position+=sizeof(steer_max);
 }
 
 void read_eeprom()
 {
-  EEPROM.get(1, PIN_joystick_speed);
-  EEPROM.get(2, PIN_joystick_steer);
-  EEPROM.get(3, inverse_speed);
-  EEPROM.get(4, inverse_steer);
-  EEPROM.get(5, correction_scale);
-  EEPROM.get(6, speed_min);
-  EEPROM.get(8, speed_middle);
-  EEPROM.get(10, speed_max);
-  EEPROM.get(12, steer_min);
-  EEPROM.get(14, steer_middle);
-  EEPROM.get(16, steer_max);
+  byte byte_position = 1;
+
+  EEPROM.get(byte_position, PIN_joystick_speed);
+  byte_position+=sizeof(PIN_joystick_speed);
+
+  EEPROM.get(byte_position, PIN_joystick_steer);
+  byte_position+=sizeof(PIN_joystick_steer);
+  
+  EEPROM.get(byte_position, inverse_speed);
+  byte_position+=sizeof(inverse_speed);
+  
+  EEPROM.get(byte_position, inverse_steer);
+  byte_position+=sizeof(inverse_steer);
+  
+  EEPROM.get(byte_position, correction_scale);
+  byte_position+=sizeof(correction_scale);
+  
+  EEPROM.get(byte_position, inverse_send_speed_steer);
+  byte_position+=sizeof(inverse_send_speed_steer);
+  
+  EEPROM.get(byte_position, speed_min);
+  byte_position+=sizeof(speed_min);
+  
+  EEPROM.get(byte_position, speed_middle);
+  byte_position+=sizeof(speed_middle);
+  
+  EEPROM.get(byte_position, speed_max);
+  byte_position+=sizeof(speed_max);
+  
+  EEPROM.get(byte_position, steer_min);
+  byte_position+=sizeof(steer_min);
+  
+  EEPROM.get(byte_position, steer_middle);
+  byte_position+=sizeof(steer_middle);
+  
+  EEPROM.get(byte_position, steer_max);
+  byte_position+=sizeof(steer_max);
+  
 }
