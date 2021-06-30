@@ -2,5 +2,5 @@
     "configuration": "cpu=atmega328old",
     "board": "arduino:avr:nano",
     "port": "COM8",
-    "sketch": "manette_v1.4.ino"
+    "sketch": "robot_controller.ino"
 }
