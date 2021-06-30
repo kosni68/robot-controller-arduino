@@ -3,7 +3,7 @@
 #include "printf.h"
 #include <EEPROM.h>
 
-#define VERSION 1.5
+#define VERSION 1.01
 #define value_to_init_eeprom 145 //change this value to erase default eeprom
 
 // ***********************************************************************
