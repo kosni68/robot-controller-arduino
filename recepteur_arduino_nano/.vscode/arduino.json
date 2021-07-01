@@ -1,0 +1,6 @@
+{
+    "port": "COM9",
+    "configuration": "cpu=16MHzatmega168",
+    "board": "arduino:avr:pro",
+    "sketch": "recepteur_arduino_nano.ino"
+}

@@ -3,7 +3,7 @@
 #include "printf.h"
 #include <EEPROM.h>
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 #define value_to_init_eeprom 144 //change this value to erase default eeprom
 
 // ***********************************************************************
@@ -42,6 +42,7 @@ struct joystick_state
   byte buttons;
   int steer_send;
   int speed_send;
+  int checksum;
 } joystate;
 
 int steer_read;
@@ -112,6 +113,8 @@ void loop()
    *  Si le robot ne répond pas dans le délai imparti,
    *  affiche un message d'erreur dans la console
    */
+
+  joystate.checksum = joystate.buttons+joystate.steer_send+joystate.speed_send;
 
   if (!nRF.write(&joystate, sizeof(struct joystick_state)))
   {
