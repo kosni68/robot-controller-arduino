@@ -1,35 +1,39 @@
+// ***********************************************************************
+// *****************************   LIBRARY   *****************************
+// ***********************************************************************
 
+#include <Arduino.h>
 #include <SPI.h>
+#include <SoftwareSerial.h>
 #include "RF24.h"
 #include "printf.h"
+
+// ***********************************************************************
+// ************************     CONSTANTES    ****************************
+// ***********************************************************************
+
+#define VERSION "1.0.1"
+#define nRF_CE 9
+#define nRF_CSn 10
+
+const byte nRF_robot_address[6] = "ABcd01";
+const byte nRF_joystick_address[6] = "EFgh23";
+
+#define HOVER_SERIAL_BAUD 38400 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
+#define SERIAL_BAUD 115200      // [-] Baud rate for built-in Serial (used for the Serial Monitor)
+#define START_FRAME 0xABCD      // [-] Start frme definition for reliable serial communication
+#define TIME_SEND 100           // [ms] Sending time interval
+#define SPEED_MAX_TEST 300      // [-] Maximum speed for testing//
+#define DEBUG_RX 0
+
+// https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
+
+// ***********************************************************************
+// ********************     VARIABLES GLOBALES     ***********************
+// ***********************************************************************
+
 int throttle;
 int steering;
-/* Brochage de la radio nRF24L01+ */
-const byte nRF_CE = 9;
-const byte nRF_CSn = 10;
-RF24 nRF(nRF_CE, nRF_CSn);
-
-/* Adresse de la radio montée sur le robot */
-const byte nRF_robot_address[6] = "lutin";
-/* Adresse de la radio montée sur la télécommande */
-const byte nRF_joystick_address[6] = "baballe";
-
-typedef struct MsgToHoverboard_t
-{
-  unsigned char SOM;  // 0x02
-  unsigned char len;  // len is len of ALL bytes to follow, including CS
-  unsigned char cmd;  // 'W'
-  unsigned char code; // code of value to write
-  int16_t base_pwm;   // absolute value ranging from -1000 to 1000 .. base_pwm plus/minus steer is the raw PWM value
-  int16_t steer;      // absolute value ranging from -1000 to 1000 .. wether steer is added or substracted depends on the side R/L
-  unsigned char CS;   // checksumm
-};
-
-typedef union UART_Packet_t
-{
-  MsgToHoverboard_t msgToHover;
-  byte UART_Packet[sizeof(MsgToHoverboard_t)];
-};
 
 /* Valeur des axes et boutons de la manette */
 struct joystick_state
@@ -63,43 +67,6 @@ const byte button_mask_start = 0x10;    /* Bouton start ou E */
 const byte button_mask_select = 0x20;   /* Bouton select ou F */
 const byte button_mask_joystick = 0x40; /* Bouton sous le stick */
 
-int16_t lValue = 0;
-int16_t rValue = 0;
-uint8_t tailValue = 84;
-
-// *******************************************************************
-//  Arduino Nano 5V example code
-//  for   https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
-//
-//  Copyright (C) 2019-2020 Emanuel FERU <aerdronix@gmail.com>
-//
-// *******************************************************************
-// INFO:
-// • This sketch uses the the Serial Software interface to communicate and send commands to the hoverboard
-// • The built-in (HW) Serial interface is used for debugging and visualization. In case the debugging is not needed,
-//   it is recommended to use the built-in Serial interface for full speed perfomace.
-// • The data packaging includes a Start Frame, checksum, and re-syncronization capability for reliable communication
-//
-// CONFIGURATION on the hoverboard side in config.h:
-// • Option 1: Serial on Right Sensor cable (short wired cable) - recommended, since the USART3 pins are 5V tolerant.
-//   #define CONTROL_SERIAL_USART3
-//   #define FEEDBACK_SERIAL_USART3
-//   // #define DEBUG_SERIAL_USART3
-// • Option 2: Serial on Left Sensor cable (long wired cable) - use only with 3.3V devices! The USART2 pins are not 5V tolerant!
-//   #define CONTROL_SERIAL_USART2
-//   #define FEEDBACK_SERIAL_USART2
-//   // #define DEBUG_SERIAL_USART2
-// *******************************************************************
-
-// ########################## DEFINES ##########################
-#define HOVER_SERIAL_BAUD 38400 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
-#define SERIAL_BAUD 115200      // [-] Baud rate for built-in Serial (used for the Serial Monitor)
-#define START_FRAME 0xABCD      // [-] Start frme definition for reliable serial communication
-#define TIME_SEND 100           // [ms] Sending time interval
-#define SPEED_MAX_TEST 300      // [-] Maximum speed for testing
-//#define DEBUG_RX                        // [-] Debug received data. Prints all bytes to serial (comment-out to disable)
-
-#include <SoftwareSerial.h>
 SoftwareSerial HoverSerial(2, 4); // RX, TX
 
 // Global variables
@@ -133,29 +100,34 @@ typedef struct
 SerialFeedback Feedback;
 SerialFeedback NewFeedback;
 
-// ########################## SETUP ##########################
+// ***********************************************************************
+// ****************   Inclusion des sous programmes   ********************
+// ***********************************************************************
+
+#include "nrf.h"
+#include "hover_serial.h"
+
+// ***********************************************************************
+// ***********************     FUNCTION SETUP     ************************
+// ***********************************************************************
+
 void setup()
 {
-
   pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(A3, OUTPUT);
 
   Serial.begin(SERIAL_BAUD);
-  Serial.println("Hoverboard Serial v1.0");
+  Serial.print(F("nRF24L01+ Robot\nVersion : "));
 
-  printf_begin();
-
-  nRF.begin();
-  nRF.openWritingPipe(nRF_joystick_address);
-  nRF.openReadingPipe(1, nRF_robot_address);
-  nRF.printDetails();
-  nRF.startListening();
+  init_nrf(nRF_robot_address, nRF_joystick_address);
 
   HoverSerial.begin(HOVER_SERIAL_BAUD);
+
   pinMode(LED_BUILTIN, OUTPUT);
 }
+
 int deadZone(int inval, int thres)
 {
   if (inval > thres)
@@ -172,136 +144,21 @@ int deadZone(int inval, int thres)
   }
 }
 
-// ########################## SEND ##########################
-void Send(int16_t uSteer, int16_t uSpeed)
-{
-  // Create command
-  Command.start = (uint16_t)START_FRAME;
-  Command.steer = (int16_t)uSteer;
-  Command.speed = (int16_t)uSpeed;
-  Command.checksum = (uint16_t)(Command.start ^ Command.steer ^ Command.speed);
-
-  // Write to Serial
-  HoverSerial.write((uint8_t *)&Command, sizeof(Command));
-}
-
-// ########################## RECEIVE ##########################
-void Receive()
-{
-  // Check for new data availability in the Serial buffer
-  if (HoverSerial.available())
-  {
-    incomingByte = HoverSerial.read();                                  // Read the incoming byte
-    bufStartFrame = ((uint16_t)(incomingByte) << 8) | incomingBytePrev; // Construct the start frame
-  }
-  else
-  {
-    return;
-  }
-
-// If DEBUG_RX is defined print all incoming bytes
-#ifdef DEBUG_RX
-  Serial.print(incomingByte);
-  return;
-#endif
-
-  // Copy received data
-  if (bufStartFrame == START_FRAME)
-  { // Initialize if new data is detected
-    p = (byte *)&NewFeedback;
-    *p++ = incomingBytePrev;
-    *p++ = incomingByte;
-    idx = 2;
-  }
-  else if (idx >= 2 && idx < sizeof(SerialFeedback))
-  { // Save the new received data
-    *p++ = incomingByte;
-    idx++;
-  }
-
-  // Check if we reached the end of the package
-  if (idx == sizeof(SerialFeedback))
-  {
-    uint16_t checksum;
-    checksum = (uint16_t)(NewFeedback.start ^ NewFeedback.cmd1 ^ NewFeedback.cmd2 ^ NewFeedback.speedR_meas ^ NewFeedback.speedL_meas ^ NewFeedback.batVoltage ^ NewFeedback.boardTemp ^ NewFeedback.cmdLed);
-
-    // Check validity of the new data
-    if (NewFeedback.start == START_FRAME && checksum == NewFeedback.checksum)
-    {
-      // Copy the new data
-      memcpy(&Feedback, &NewFeedback, sizeof(SerialFeedback));
-
-      // Print data to built-in Serial
-      Serial.print("1: ");
-      Serial.print(Feedback.cmd1);
-      Serial.print(" 2: ");
-      Serial.print(Feedback.cmd2);
-      Serial.print(" 3: ");
-      Serial.print(Feedback.speedR_meas);
-      Serial.print(" 4: ");
-      Serial.print(Feedback.speedL_meas);
-      Serial.print(" 5: ");
-      Serial.print(Feedback.batVoltage);
-      Serial.print(" 6: ");
-      Serial.print(Feedback.boardTemp);
-      Serial.print(" 7: ");
-      Serial.println(Feedback.cmdLed);
-    }
-    else
-    {
-      Serial.println("Non-valid data skipped");
-    }
-    idx = 0; // Reset the index (it prevents to enter in this if condition in the next cycle)
-  }
-
-  // Update previous states
-  incomingBytePrev = incomingByte;
-}
-
-// ########################## LOOP ##########################
+// ***********************************************************************
+// ***********************     FUNCTION LOOP     *************************
+// ***********************************************************************
 
 unsigned long iTimeSend = 0;
 int iTestMax = SPEED_MAX_TEST;
 int iTest = 0;
 
-void loop(void)
+void loop()
 {
 
   static int32_t last_joystick_time = 0;
 
-  /* Teste si l'on a reçu un message provenant de la télécommande */
-  while (nRF.available())
-  {
-    /* Oui, alors on extrait la structure de donnée du message reçu */
-    nRF.read(&joystate, sizeof(struct joystick_state));
-
-    if (joystate.checksum != joystate.buttons + joystate.axis_x + joystate.axis_y)
-    {
-      Serial.print("error checksum nrf");
-      return;
-    }
-
-    Serial.print("steer = ");
-    Serial.print(joystate.axis_x);
-    Serial.print("\t\tspeed = ");
-    Serial.println(joystate.axis_y);
-
-    last_joystick_time = millis();
-
-    int steering = deadZone(joystate.axis_x - 512, 1);
-    int throttle = deadZone(joystate.axis_y - 512, 1); //anc 20
-
-    Send(steering, throttle);
-    Serial.print("steering = ");
-    Serial.print(steering);
-    Serial.print("\t\tthrottle = ");
-    Serial.println(throttle);
-
-    digitalWrite(A0, joystate.buttons & button_mask_up);
-    digitalWrite(A1, joystate.buttons & button_mask_right);
-    digitalWrite(A2, joystate.buttons & button_mask_down);
-    digitalWrite(A3, joystate.buttons & button_mask_left);
-  }
+  nrf_send_data();
+  nrf_receive_data();
 
   /* Si l'on n'a pas reçu de message de la télécommande depuis plus de 500 ms */
   if (millis() - last_joystick_time > 500)
@@ -311,10 +168,8 @@ void loop(void)
     digitalWrite(A1, LOW);
     digitalWrite(A2, LOW);
     digitalWrite(A3, LOW);
-    Send(0, 0);
+    hoverserial_send(0, 0);
     delay(100);
   }
-  // Receive();
+  // hoverserial_receive();
 }
-
-// ########################## END ##########################
