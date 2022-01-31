@@ -169,7 +169,7 @@ void read_serial()
   }
 }
 
-void print_serial_pause()
+void serial_print_pause()
 {
   if (serial_print)
   {

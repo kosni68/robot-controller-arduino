@@ -1,10 +1,5 @@
-
-#define VERSION "1.0.3"
-#define value_to_init_eeprom 144 //change this value to erase default eeprom
-#define ADDRESS_I2C_LCD 0x26
-
 // ***********************************************************************
-// ****************   Inclusion des bibliothèques   **********************
+// *****************************   LIBRARY   *****************************
 // ***********************************************************************
 
 #include <Arduino.h>
@@ -16,11 +11,22 @@
 #include <LiquidCrystal_I2C.h>
 
 // ***********************************************************************
-// ********************     VARIABLES GLOBALES     ***********************
+// ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-const byte nRF_robot_address[6] = "lutin";
-const byte nRF_joystick_address[6] = "baball";
+#define VERSION "1.0.4"
+#define value_to_init_eeprom 144 //change this value to erase default eeprom
+#define ADDRESS_I2C_LCD 0x26
+
+#define nRF_CE 9
+#define nRF_CSn 10
+
+const byte nRF_robot_address[6] = "ABcd01";
+const byte nRF_joystick_address[6] = "EFgh23";
+
+// ***********************************************************************
+// ********************     VARIABLES GLOBALES     ***********************
+// ***********************************************************************
 
 byte PIN_joystick_speed;
 byte PIN_joystick_steer;
@@ -42,10 +48,6 @@ int steer_max;
 
 bool correction_scale = LOW;
 
-const byte nRF_CE = 9;
-const byte nRF_CSn = 10;
-RF24 nRF(nRF_CE, nRF_CSn);
-
 struct joystick_state
 {
   byte buttons;
@@ -57,8 +59,30 @@ struct joystick_state
 int steer_read;
 int speed_read;
 
+struct feedback_data
+{
+  uint16_t start;
+  int16_t cmd1;
+  int16_t cmd2;
+  int16_t speedR_meas;
+  int16_t speedL_meas;
+  int16_t batVoltage;
+  int16_t boardTemp;
+  uint16_t cmdLed;
+  uint16_t checksum;
+} robot_feedback;
 
 LiquidCrystal_I2C lcd(ADDRESS_I2C_LCD, 20, 4);
+
+enum item_mode_lcd
+{
+  JOYSTICK,
+  FEEDBACK,
+}; 
+
+byte mode_print_lcd = JOYSTICK;
+byte last_mode_print_lcd=-1;
+
 bool connection_lcd = LOW;
 
 // ***********************************************************************
@@ -66,11 +90,13 @@ bool connection_lcd = LOW;
 // ***********************************************************************
 
 #include "i2c.h"
+#include "util.h"
 #include "rom.h"
 #include "button.h"
 #include "joystick.h"
 #include "config.h"
 #include "lcd.h"
+#include "nrf.h"
 
 // ***********************************************************************
 // ***********************     FUNCTION SETUP     ************************
@@ -88,7 +114,6 @@ void setup()
   init_eeprom();
   setup_Lcd();
 
-
   Serial.println(F(" init port"));
   /* Initialisation des ports du joystick
    *  Ports en entrées, activer les pull-ups
@@ -98,15 +123,8 @@ void setup()
   DDRB &= 0xFE;
   PORTB |= 0x01;
 
-  Serial.println(F(" init nrf"));
-  /* Initialisation de la radio nRF24L01 */
-  printf_begin();
-  nRF.begin();
-  nRF.openWritingPipe(nRF_robot_address);
-  nRF.openReadingPipe(1, nRF_joystick_address);
-  nRF.printDetails();
+  init_nrf(nRF_robot_address,nRF_joystick_address);
 
-  Serial.print(F(" end setup"));
 }
 
 // ***********************************************************************
@@ -116,40 +134,19 @@ void setup()
 void loop()
 {
 
-  unsigned int temps_loop_depart = millis();
+  unsigned long start_millis_loop = millis();
 
   read_serial();
-  print_serial_pause();
+  serial_print_pause();
   read_joystick();
   read_button();
   print_lcd();
 
-
-  /* Envoie l'état du joystick au robot
-   *  Si le robot ne répond pas dans le délai imparti,
-   *  affiche un message d'erreur dans la console
-   */
-
   joystate.checksum = joystate.buttons + joystate.steer_send + joystate.speed_send;
 
-  if (!nRF.write(&joystate, sizeof(struct joystick_state)))
-  {
-    if (serial_print)
-    {
-      Serial.println(F("(Not Ack'd from bot)"));
-    }
-  }
-  else
-  {
-    if (serial_print)
-    {
-      Serial.println(F("(OK)"));
-    }
-  }
-
-  /* Attente de 20ms avant le prochain envoi */
-  delay(20);
+  nrf_send_data();
+  nrf_receive_data();
 
   Serial.print(F("temp loop ="));
-  Serial.println(String(millis() - temps_loop_depart));
+  Serial.println(String(millis() - start_millis_loop));
 }
