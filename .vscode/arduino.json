@@ -1,6 +1,6 @@
 {
     "configuration": "cpu=atmega328old",
     "board": "arduino:avr:nano",
-    "port": "COM8",
-    "sketch": "robot_controller.ino"
+    "port": "COM4",
+    "sketch": "robot_controller\\robot_controller.ino"
 }
