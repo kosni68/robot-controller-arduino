@@ -56,7 +56,6 @@ struct joystick_state
 
   int axis_x;
   int axis_y;
-  int checksum;
 } joystate;
 
 const byte button_mask_up = 0x01;       /* Bouton haut ou A */
@@ -99,6 +98,8 @@ typedef struct
 } SerialFeedback;
 SerialFeedback Feedback;
 SerialFeedback NewFeedback;
+
+static int32_t last_joystick_time = 0;
 
 // ***********************************************************************
 // ****************   Inclusion des sous programmes   ********************
@@ -155,10 +156,29 @@ int iTest = 0;
 void loop()
 {
 
-  static int32_t last_joystick_time = 0;
-
   nrf_send_data();
   nrf_receive_data();
+
+  Serial.print("steer = ");
+  Serial.print(joystate.axis_x);
+  Serial.print("\t\tspeed = ");
+  Serial.println(joystate.axis_y);
+
+  last_joystick_time = millis();
+
+  int steering = deadZone(joystate.axis_x - 512, 1);
+  int throttle = deadZone(joystate.axis_y - 512, 1); //anc 20
+
+  hoverserial_send(steering, throttle);
+  Serial.print("steering = ");
+  Serial.print(steering);
+  Serial.print("\t\tthrottle = ");
+  Serial.println(throttle);
+
+  digitalWrite(A0, joystate.buttons & button_mask_up);
+  digitalWrite(A1, joystate.buttons & button_mask_right);
+  digitalWrite(A2, joystate.buttons & button_mask_down);
+  digitalWrite(A3, joystate.buttons & button_mask_left);
 
   /* Si l'on n'a pas reçu de message de la télécommande depuis plus de 500 ms */
   if (millis() - last_joystick_time > 500)
