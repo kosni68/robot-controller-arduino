@@ -7,12 +7,12 @@ void nrf_send_data()
   if (!nRF.write(&joystate, sizeof(struct joystick_state)))
   {
     if (serial_print)
-      Serial.println(F("(Not Ack'd from bot)"));
+      Serial.println(F("Not Ack'd from bot"));
   }
   else
   {
     if (serial_print)
-      Serial.println(F("(OK)"));
+      Serial.println(F("Ack from bot"));
   }
 }
 
@@ -23,13 +23,13 @@ void nrf_receive_data()
   if (nRF.available())
   {
     nRF.read(&robot_feedback, sizeof(struct feedback_data));
-    Serial.println(F("(available)"));
+    Serial.println(F("nRF available"));
   }
   else
-    Serial.println(F("(no available)"));
+    Serial.println(F("nRF no available"));
 }
 
-void init_nrf(const byte robot_address[6], const byte joystick_address[6])
+void init_nrf(const byte tx_address[6], const byte rx_address[6])
 {
   Serial.println(F(" init nrf"));
 
@@ -37,7 +37,7 @@ void init_nrf(const byte robot_address[6], const byte joystick_address[6])
   if (!nRF.begin())
     Serial.println(F("radio hardware is not responding!!"));
 
-  nRF.openWritingPipe(robot_address);
-  nRF.openReadingPipe(1, joystick_address);
+  nRF.openWritingPipe(tx_address);
+  nRF.openReadingPipe(1, rx_address);
   nRF.printDetails();
 }

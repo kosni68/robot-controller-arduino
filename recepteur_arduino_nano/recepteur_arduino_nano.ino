@@ -16,8 +16,8 @@
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcd01";
-const byte nRF_joystick_address[6] = "EFgh23";
+const byte nRF_robot_address[6] = "ABcd0";
+const byte nRF_joystick_address[6] = "EFgh1";
 
 #define HOVER_SERIAL_BAUD 38400 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
 #define SERIAL_BAUD 115200      // [-] Baud rate for built-in Serial (used for the Serial Monitor)
@@ -122,7 +122,7 @@ void setup()
   Serial.begin(SERIAL_BAUD);
   Serial.print(F("nRF24L01+ Robot\nVersion : "));
 
-  init_nrf(nRF_robot_address, nRF_joystick_address);
+  init_nrf(nRF_joystick_address,nRF_robot_address);
 
   HoverSerial.begin(HOVER_SERIAL_BAUD);
 
@@ -149,12 +149,9 @@ int deadZone(int inval, int thres)
 // ***********************     FUNCTION LOOP     *************************
 // ***********************************************************************
 
-unsigned long iTimeSend = 0;
-int iTestMax = SPEED_MAX_TEST;
-int iTest = 0;
-
 void loop()
 {
+  unsigned long start_millis_loop = millis();
 
   nrf_send_data();
   nrf_receive_data();
@@ -170,10 +167,10 @@ void loop()
   int throttle = deadZone(joystate.axis_y - 512, 1); //anc 20
 
   hoverserial_send(steering, throttle);
-  Serial.print("steering = ");
+  /*Serial.print("steering = ");
   Serial.print(steering);
   Serial.print("\t\tthrottle = ");
-  Serial.println(throttle);
+  Serial.println(throttle);*/
 
   digitalWrite(A0, joystate.buttons & button_mask_up);
   digitalWrite(A1, joystate.buttons & button_mask_right);
@@ -192,4 +189,7 @@ void loop()
     delay(100);
   }
   // hoverserial_receive();
+  
+  Serial.print(F("temp loop ="));
+  Serial.println(String(millis() - start_millis_loop));
 }

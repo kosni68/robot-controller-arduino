@@ -21,8 +21,8 @@
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcd01";
-const byte nRF_joystick_address[6] = "EFgh23";
+const byte nRF_robot_address[6] = "ABcd0";
+const byte nRF_joystick_address[6] = "EFgh1";
 
 // ***********************************************************************
 // ********************     VARIABLES GLOBALES     ***********************
