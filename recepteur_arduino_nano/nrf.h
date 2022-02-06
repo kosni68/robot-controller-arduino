@@ -6,26 +6,31 @@ void nrf_send_data()
 
   if (!nRF.write(&Feedback, sizeof(SerialFeedback)))
   {
-    //Serial.println(F("Not Ack'd from controller"));
+    // Serial.println(F("Not Ack'd from controller"));
   }
   else
   {
-    //Serial.println(F("Ack controller"));
+    // Serial.println(F("Ack controller"));
   }
 }
 
-void nrf_receive_data()
+bool nrf_receive_data()
 {
   nRF.startListening();
 
   if (nRF.available())
   {
-    nRF.read(&joystate, sizeof(struct joystick_state));
-    //Serial.println(F("nRF available"));
+    while (nRF.available())
+    {
+      nRF.read(&joystate, sizeof(struct joystick_state));
+      // Serial.println(F("nRF available"));
+      return HIGH;
+    }
   }
   else
   {
-    //Serial.println(F("nrf no available"));
+    // Serial.println(F("nrf no available"));
+    return LOW;
   }
 }
 

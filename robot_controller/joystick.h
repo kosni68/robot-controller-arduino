@@ -2,30 +2,27 @@
 // ***************************    SCALING    *****************************
 // ***********************************************************************
 
-int scaling(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max)
+int scaling(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max, int min, int maximum)
 {
-  int valeur_retournee;
-  int zero = 0;
-  int moyen = 512;
-  int maximum = 1023;
+  int return_value;
+  int middle = 0;
   int deadzone = 30;
 
-  if (analogread > analogread_value_middle - deadzone && analogread < analogread_value_middle + deadzone)
-    valeur_retournee = moyen;
+  return_value = middle;
 
-  else if (analogread > analogread_value_middle + deadzone)
+  if (analogread > analogread_value_middle + deadzone)
   {
-    valeur_retournee = map(analogread, analogread_value_middle + deadzone, analogread_value_max, moyen, maximum);
-    if (valeur_retournee > maximum)
+    return_value = map(analogread, analogread_value_middle + deadzone, analogread_value_max, middle, maximum);
+    if (return_value > maximum)
       return maximum;
   }
   else if (analogread < analogread_value_middle - deadzone)
   {
-    valeur_retournee = map(analogread, analogread_value_middle - deadzone, analogread_value_min, moyen, zero);
-    if (valeur_retournee < zero)
-      return zero;
+    return_value = map(analogread, analogread_value_middle - deadzone, analogread_value_min, middle, min);
+    if (return_value < min)
+      return min;
   }
-  return valeur_retournee;
+  return return_value;
 }
 
 // ***********************************************************************
@@ -34,17 +31,14 @@ int scaling(int analogread, int analogread_value_min, int analogread_value_middl
 
 void read_joystick()
 {
-  joystate.buttons = (~PIND >> 2) & 0x7F;
-  if (PINB & 0x01)
-    joystate.buttons &= ~button_mask_joystick;
 
   speed_read = analogRead(PIN_joystick_speed);
   steer_read = analogRead(PIN_joystick_steer);
 
   if (correction_scale)
   {
-    joystate.speed_send = scaling(speed_read, speed_min, speed_middle, speed_max);
-    joystate.steer_send = scaling(steer_read, steer_min, steer_middle, steer_max);
+    joystate.speed_send = scaling(speed_read, joystick_speed_min, joystick_speed_middle, joystick_speed_max, send_value_speed_min, send_value_speed_max);
+    joystate.steer_send = scaling(steer_read, joystick_steer_min, joystick_steer_middle, joystick_steer_max, send_value_steer_min, send_value_steer_max);
   }
   else
   {
@@ -53,11 +47,11 @@ void read_joystick()
   }
 
   if (inverse_speed)
-    joystate.speed_send = 1023 - joystate.speed_send;
+    joystate.speed_send = -joystate.speed_send;
   if (inverse_steer)
-    joystate.steer_send = 1023 - joystate.steer_send;
+    joystate.steer_send = -joystate.steer_send;
 
-  if (serial_print)
+  if (SERIAL_DEBUG)
   {
     Serial.print(F("\t\t speed_read = "));
     Serial.print(speed_read);
@@ -127,17 +121,22 @@ void calibration_joystick(byte PIN_joystick, int &value_read_min, int &value_rea
 
 int calibration_auto()
 {
+
+  print_lcd_cal_no_move();
+
   Serial.println(F("\n **** keep the speed joystick in the central position ****"));
-  calibration_joystick(PIN_joystick_speed, speed_middle);
+  calibration_joystick(PIN_joystick_speed, joystick_speed_middle);
 
   Serial.println(F("\n **** keep the steer joystick in the central position ****"));
-  calibration_joystick(PIN_joystick_steer, steer_middle);
+  calibration_joystick(PIN_joystick_steer, joystick_steer_middle);
 
   Serial.println(F("\n **** move the speed joystick up and down ****"));
-  calibration_joystick(PIN_joystick_speed, speed_min, speed_max);
+  print_lcd_cal_move_speed();
+  calibration_joystick(PIN_joystick_speed, joystick_speed_min, joystick_speed_max);
 
   Serial.println(F("\n **** move the steer joystick from right to left ****"));
-  calibration_joystick(PIN_joystick_steer, steer_min, steer_max);
+  print_lcd_cal_move_steer();
+  calibration_joystick(PIN_joystick_steer, joystick_steer_min, joystick_steer_max);
 
   correction_scale = HIGH;
   save_eeprom();

@@ -14,9 +14,9 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "1.0.4"
-#define value_to_init_eeprom 144 //change this value to erase default eeprom
-#define ADDRESS_I2C_LCD 0x26
+#define VERSION "1.0.5"
+#define value_to_init_eeprom 154 //change this value to erase default eeprom
+#define ADDRESS_I2C_LCD 0x26 //0x3F
 
 #define nRF_CE 9
 #define nRF_CSn 10
@@ -24,12 +24,15 @@
 const byte nRF_robot_address[6] = "ABcd0";
 const byte nRF_joystick_address[6] = "EFgh1";
 
+#define SERIAL_DEBUG LOW
+
 // ***********************************************************************
 // ********************     VARIABLES GLOBALES     ***********************
 // ***********************************************************************
 
 byte PIN_joystick_speed;
 byte PIN_joystick_steer;
+byte PIN_buzzer;
 
 bool serial_print = HIGH;
 unsigned long millis_serial_pause = 0;
@@ -38,13 +41,19 @@ bool inverse_speed = LOW;
 bool inverse_steer = LOW;
 bool inverse_send_speed_steer = LOW;
 
-int speed_min;
-int speed_middle;
-int speed_max;
+int joystick_speed_min;
+int joystick_speed_middle;
+int joystick_speed_max;
 
-int steer_min;
-int steer_middle;
-int steer_max;
+int joystick_steer_min;
+int joystick_steer_middle;
+int joystick_steer_max;
+
+int send_value_steer_min;
+int send_value_steer_max;
+
+int send_value_speed_min;
+int send_value_speed_max;
 
 bool correction_scale = LOW;
 
@@ -53,7 +62,6 @@ struct joystick_state
   byte buttons;
   int steer_send;
   int speed_send;
-  int checksum;
 } joystate;
 
 int steer_read;
@@ -78,10 +86,12 @@ enum item_mode_lcd
 {
   JOYSTICK,
   FEEDBACK,
+  PINOUT,
 }; 
 
 byte mode_print_lcd = JOYSTICK;
-byte last_mode_print_lcd=-1;
+int last_mode_print_lcd=-1;
+static int32_t last_print_lcd_time = 0;
 
 bool connection_lcd = LOW;
 
@@ -93,10 +103,11 @@ bool connection_lcd = LOW;
 #include "util.h"
 #include "rom.h"
 #include "button.h"
+#include "lcd.h"
 #include "joystick.h"
 #include "config.h"
-#include "lcd.h"
 #include "nrf.h"
+#include "buzzer.h"
 
 // ***********************************************************************
 // ***********************     FUNCTION SETUP     ************************
@@ -141,8 +152,6 @@ void loop()
   read_joystick();
   read_button();
   print_lcd();
-
-  joystate.checksum = joystate.buttons + joystate.steer_send + joystate.speed_send;
 
   nrf_send_data();
   nrf_receive_data();
