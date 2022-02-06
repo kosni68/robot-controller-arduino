@@ -1,6 +1,6 @@
 RF24 nRF(nRF_CE, nRF_CSn);
 
-void nrf_send_data()
+bool nrf_send_data()
 {
   nRF.stopListening();
 
@@ -8,11 +8,13 @@ void nrf_send_data()
   {
     if (SERIAL_DEBUG)
       Serial.println(F("Not Ack'd from bot"));
+    return LOW;
   }
   else
   {
     if (SERIAL_DEBUG)
       Serial.println(F("Ack from bot"));
+    return HIGH;
   }
 }
 

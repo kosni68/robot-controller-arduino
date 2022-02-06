@@ -7,6 +7,7 @@ void variable_default()
 {
   PIN_joystick_speed = 15;
   PIN_joystick_steer = 16;
+  PIN_buzzer = 5;
 
   inverse_speed = LOW;
   inverse_steer = LOW;
@@ -37,6 +38,9 @@ void save_eeprom()
 
   EEPROM.put(byte_position, PIN_joystick_steer);
   byte_position+=sizeof(PIN_joystick_steer);
+
+  EEPROM.put(byte_position, PIN_buzzer);
+  byte_position+=sizeof(PIN_buzzer);
 
   EEPROM.put(byte_position, inverse_speed);
   byte_position+=sizeof(inverse_speed);
@@ -91,6 +95,9 @@ void read_eeprom()
 
   EEPROM.get(byte_position, PIN_joystick_steer);
   byte_position+=sizeof(PIN_joystick_steer);
+  
+  EEPROM.get(byte_position, PIN_buzzer);
+  byte_position+=sizeof(PIN_buzzer);
   
   EEPROM.get(byte_position, inverse_speed);
   byte_position+=sizeof(inverse_speed);

@@ -16,7 +16,7 @@
 
 #define VERSION "1.0.5"
 #define value_to_init_eeprom 154 //change this value to erase default eeprom
-#define ADDRESS_I2C_LCD 0x26 //0x3F
+#define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
 #define nRF_CSn 10
@@ -36,6 +36,7 @@ byte PIN_buzzer;
 
 bool serial_print = HIGH;
 unsigned long millis_serial_pause = 0;
+unsigned long last_ack_send_data_time = 0;
 
 bool inverse_speed = LOW;
 bool inverse_steer = LOW;
@@ -87,10 +88,10 @@ enum item_mode_lcd
   JOYSTICK,
   FEEDBACK,
   PINOUT,
-}; 
+};
 
 byte mode_print_lcd = JOYSTICK;
-int last_mode_print_lcd=-1;
+int last_mode_print_lcd = -1;
 static int32_t last_print_lcd_time = 0;
 
 bool connection_lcd = LOW;
@@ -134,8 +135,9 @@ void setup()
   DDRB &= 0xFE;
   PORTB |= 0x01;
 
-  init_nrf(nRF_robot_address,nRF_joystick_address);
+  init_nrf(nRF_robot_address, nRF_joystick_address);
 
+  init_buzzer();
 }
 
 // ***********************************************************************
@@ -153,9 +155,22 @@ void loop()
   read_button();
   print_lcd();
 
-  nrf_send_data();
+  if (!nrf_send_data())
+  {
+    if (millis() - last_ack_send_data_time > 150)
+    {
+      tone(PIN_buzzer, 900);
+    }
+  }
+  else
+  {
+    noTone(PIN_buzzer);
+    last_ack_send_data_time = millis();
+  }
+  
+
   nrf_receive_data();
 
-  Serial.print(F("temp loop ="));
-  Serial.println(String(millis() - start_millis_loop));
+  /*Serial.print(F("temp loop ="));
+  Serial.println(String(millis() - start_millis_loop));*/
 }

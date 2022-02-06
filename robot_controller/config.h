@@ -31,45 +31,51 @@ void read_serial()
     if (mot_recu == "$$")
     {
       Serial.println(F("$# : Calibration automatique "));
+
+      Serial.println(F("PIN :"));
       Serial.print(F("$1 : PIN speed = "));
       Serial.println(PIN_joystick_speed);
       Serial.print(F("$2 : PIN steer = "));
       Serial.println(PIN_joystick_steer);
-      Serial.print(F("$3 : inverse speed = "));
+      Serial.print(F("$3 : PIN buzzer = "));
+      Serial.println(PIN_buzzer);
+
+      Serial.println(F("Enable/disable :"));
+      Serial.print(F("$10 : inverse speed = "));
       Serial.println(inverse_speed);
-      Serial.print(F("$4 : inverse steer = "));
+      Serial.print(F("$11 : inverse steer = "));
       Serial.println(inverse_steer);
-      Serial.print(F("$5 : inverse send speed_steer = " ));
+      Serial.print(F("$12 : inverse send speed_steer = " ));
       Serial.println(inverse_send_speed_steer);
-      Serial.print(F("$6 : enable correction scale = "));
+      Serial.print(F("$13 : enable correction scale = "));
       Serial.println(correction_scale);
 
       Serial.println(F("Analog read joystick speed :"));
-      Serial.print(F("$7 : speed value min = "));
+      Serial.print(F("$21 : speed value min = "));
       Serial.println(joystick_speed_min);
-      Serial.print(F("$8 : speed value middle = "));
+      Serial.print(F("$22 : speed value middle = "));
       Serial.println(joystick_speed_middle);
-      Serial.print(F("$9 : speed value max = "));
+      Serial.print(F("$23 : speed value max = "));
       Serial.println(joystick_speed_max);
 
       Serial.println(F("Analog read joystick steer :"));
-      Serial.print(F("$10 : steer value min = "));
+      Serial.print(F("$24 : steer value min = "));
       Serial.println(joystick_steer_min);
-      Serial.print(F("$11 : steer value middle = "));
+      Serial.print(F("$25 : steer value middle = "));
       Serial.println(joystick_steer_middle);
-      Serial.print(F("$12 : steer value max = "));
+      Serial.print(F("$26 : steer value max = "));
       Serial.println(joystick_steer_max);
 
       Serial.println(F("Send value Speed :"));
-      Serial.print(F("$13 : send speed min = "));
+      Serial.print(F("$31 : send speed min = "));
       Serial.println(send_value_steer_min);
-      Serial.print(F("$14 : send speed max = "));
+      Serial.print(F("$32 : send speed max = "));
       Serial.println(send_value_steer_max);
 
       Serial.println(F("Send value Steer :"));
-      Serial.print(F("$15 : send steer min = "));
+      Serial.print(F("$33 : send steer min = "));
       Serial.println(send_value_speed_min);
-      Serial.print(F("$16 : send steer max = "));
+      Serial.print(F("$34 : send steer max = "));
       Serial.println(send_value_speed_max);
 
       Serial.println(F("\n"));
@@ -79,42 +85,42 @@ void read_serial()
       Serial.println(F("\n \t\t **** Calibration automatique ****"));
       calibration_auto();
     }
-    else if (mot_recu == "$3=1")
+    else if (mot_recu == "$10=1")
     {
       Serial.println(F("inverse_speed HIGH\n\n"));
       inverse_speed = HIGH;
     }
-    else if (mot_recu == "$3=0")
+    else if (mot_recu == "$10=0")
     {
       Serial.println(F("inverse_speed LOW\n\n"));
       inverse_speed = LOW;
     }
-    else if (mot_recu == "$4=1")
+    else if (mot_recu == "$11=1")
     {
       Serial.println(F("inverse_steer HIGH\n\n"));
       inverse_steer = HIGH;
     }
-    else if (mot_recu == "$4=0")
+    else if (mot_recu == "$11=0")
     {
       Serial.println(F("inverse_steer LOW\n\n"));
       inverse_steer = LOW;
     }
-    else if (mot_recu == "$5=1")
+    else if (mot_recu == "$12=1")
     {
       Serial.println(F("inverse_send_speed_steer HIGH\n\n"));
       inverse_send_speed_steer = HIGH;
     }
-    else if (mot_recu == "$5=0")
+    else if (mot_recu == "$12=0")
     {
       Serial.println(F("inverse_send_speed_steer LOW\n\n"));
       inverse_send_speed_steer = LOW;
     }
-    else if (mot_recu == "$6=1")
+    else if (mot_recu == "$13=1")
     {
       Serial.println(F("correction_scale HIGH\n\n"));
       correction_scale = HIGH;
     }
-    else if (mot_recu == "$6=0")
+    else if (mot_recu == "$13=0")
     {
       Serial.println(F("correction_scale LOW\n\n"));
       correction_scale = LOW;
@@ -135,70 +141,77 @@ void read_serial()
         Serial.print(F("PIN_joystick_steer :"));
         Serial.println(PIN_joystick_steer);
       }
-      else if (mot_recu.indexOf("$7=", 0) == 0)
+      else if (mot_recu.indexOf("$3=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_buzzer = mot_recu.toInt();
+        Serial.print(F("PIN_buzzer :"));
+        Serial.println(PIN_buzzer);
+      }
+      else if (mot_recu.indexOf("$21=", 0) == 0)
       {
         mot_recu.remove(0, 3);
         joystick_speed_min = mot_recu.toInt();
         Serial.print(F("speed value min :"));
         Serial.println(joystick_speed_min);
       }
-      else if (mot_recu.indexOf("$8=", 0) == 0)
+      else if (mot_recu.indexOf("$22=", 0) == 0)
       {
         mot_recu.remove(0, 3);
         joystick_speed_middle = mot_recu.toInt();
         Serial.print(F("speed value middle :"));
         Serial.println(joystick_speed_middle);
       }
-      else if (mot_recu.indexOf("$9=", 0) == 0)
+      else if (mot_recu.indexOf("$23=", 0) == 0)
       {
         mot_recu.remove(0, 3);
         joystick_speed_max = mot_recu.toInt();
         Serial.print(F("speed value max :"));
         Serial.println(joystick_speed_max);
       }
-      else if (mot_recu.indexOf("$10=", 0) == 0)
+      else if (mot_recu.indexOf("$24=", 0) == 0)
       {
         mot_recu.remove(0, 3);
         joystick_steer_min = mot_recu.toInt();
         Serial.print(F("steer value min :"));
         Serial.println(joystick_steer_min);
       }
-      else if (mot_recu.indexOf("$11=", 0) == 0)
+      else if (mot_recu.indexOf("$25=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         joystick_steer_middle = mot_recu.toInt();
         Serial.print(F("steer value middle :"));
         Serial.println(joystick_steer_middle);
       }
-      else if (mot_recu.indexOf("$12=", 0) == 0)
+      else if (mot_recu.indexOf("$26=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         joystick_steer_max = mot_recu.toInt();
         Serial.print(F("steer value max :"));
         Serial.println(joystick_steer_max);
       }
-      else if (mot_recu.indexOf("$13=", 0) == 0)
+      else if (mot_recu.indexOf("$31=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         send_value_speed_min = mot_recu.toInt();
         Serial.print(F("send value speed min :"));
         Serial.println(send_value_speed_min);
       }
-      else if (mot_recu.indexOf("$14=", 0) == 0)
+      else if (mot_recu.indexOf("$32=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         send_value_speed_max = mot_recu.toInt();
         Serial.print(F("send value speed max :"));
         Serial.println(send_value_speed_max);
       }
-      else if (mot_recu.indexOf("$15=", 0) == 0)
+      else if (mot_recu.indexOf("$33=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         send_value_steer_min = mot_recu.toInt();
         Serial.print(F("send value steer min :"));
         Serial.println(send_value_steer_min);
       }
-      else if (mot_recu.indexOf("$16=", 0) == 0)
+      else if (mot_recu.indexOf("$34=", 0) == 0)
       {
         mot_recu.remove(0, 4);
         send_value_steer_max = mot_recu.toInt();
