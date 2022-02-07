@@ -150,28 +150,28 @@ void read_serial()
       }
       else if (mot_recu.indexOf("$21=", 0) == 0)
       {
-        mot_recu.remove(0, 3);
+        mot_recu.remove(0, 4);
         joystick_speed_min = mot_recu.toInt();
         Serial.print(F("speed value min :"));
         Serial.println(joystick_speed_min);
       }
       else if (mot_recu.indexOf("$22=", 0) == 0)
       {
-        mot_recu.remove(0, 3);
+        mot_recu.remove(0, 4);
         joystick_speed_middle = mot_recu.toInt();
         Serial.print(F("speed value middle :"));
         Serial.println(joystick_speed_middle);
       }
       else if (mot_recu.indexOf("$23=", 0) == 0)
       {
-        mot_recu.remove(0, 3);
+        mot_recu.remove(0, 4);
         joystick_speed_max = mot_recu.toInt();
         Serial.print(F("speed value max :"));
         Serial.println(joystick_speed_max);
       }
       else if (mot_recu.indexOf("$24=", 0) == 0)
       {
-        mot_recu.remove(0, 3);
+        mot_recu.remove(0, 4);
         joystick_steer_min = mot_recu.toInt();
         Serial.print(F("steer value min :"));
         Serial.println(joystick_steer_min);
