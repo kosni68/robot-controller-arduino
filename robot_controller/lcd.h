@@ -119,6 +119,38 @@ void print_lcd_joy()
   lcd.print(str_lcd(joystate.steer_send, 6));
 }
 
+void print_lcd_joy_curve()
+{
+
+  if (last_mode_print_lcd != mode_print_lcd)
+  {
+    lcd.clear();
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("Joystick curve");
+    lcd.setCursor(7, 1);
+    lcd.print("ax+b:");
+    lcd.setCursor(14, 1);
+    lcd.print("ax2+bx:");
+    lcd.setCursor(0, 2);
+    lcd.print("Speed:");
+    lcd.setCursor(0, 3);
+    lcd.print("Steer:");
+
+    last_mode_print_lcd = mode_print_lcd;
+  }
+
+  lcd.setCursor(7, 2);
+  lcd.print(str_lcd(speed, 6));
+  lcd.setCursor(7, 3);
+  lcd.print(str_lcd(steer, 6));
+
+  lcd.setCursor(14, 2);
+  lcd.print(str_lcd(joystate.speed_send, 6));
+  lcd.setCursor(14, 3);
+  lcd.print(str_lcd(joystate.steer_send, 6));
+}
+
 void print_lcd_feedback()
 {
 
@@ -154,7 +186,7 @@ void print_lcd_pinout()
     lcd.clear();
     lcd.backlight();
     lcd.setCursor(0, 0);
-    lcd.print("Pinout");
+    lcd.print("Pin :");
 
     lcd.setCursor(0, 1);
     lcd.print("Speed:");
@@ -174,7 +206,7 @@ void print_lcd_pinout()
     lcd.setCursor(11, 2);
     lcd.print("Lcd: 0x");
     lcd.setCursor(18, 2);
-    lcd.print(ADDRESS_I2C_LCD);
+    lcd.print(ADDRESS_I2C_LCD,HEX);
 
     last_mode_print_lcd = mode_print_lcd;
   }
@@ -227,6 +259,10 @@ void print_lcd()
     {
     case JOYSTICK:
       print_lcd_joy();
+      break;
+
+    case JOYSTICK_CURVE:
+      print_lcd_joy_curve();
       break;
 
     case FEEDBACK:

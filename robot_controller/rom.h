@@ -6,8 +6,8 @@
 void variable_default()
 {
   PIN_joystick_speed = 15;
-  PIN_joystick_steer = 16;
-  PIN_buzzer = 5;
+  PIN_joystick_steer = 14;
+  PIN_buzzer = 3;
 
   inverse_speed = LOW;
   inverse_steer = LOW;

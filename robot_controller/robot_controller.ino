@@ -9,13 +9,14 @@
 #include "printf.h"
 #include <EEPROM.h>
 #include <LiquidCrystal_I2C.h>
+#include "Polynomial.h"
 
 // ***********************************************************************
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "1.0.5"
-#define value_to_init_eeprom 154 //change this value to erase default eeprom
+#define VERSION "1.0.6"
+#define value_to_init_eeprom 151 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
@@ -41,6 +42,9 @@ unsigned long last_ack_send_data_time = 0;
 bool inverse_speed = LOW;
 bool inverse_steer = LOW;
 bool inverse_send_speed_steer = LOW;
+
+int speed;
+int steer;
 
 int joystick_speed_min;
 int joystick_speed_middle;
@@ -86,6 +90,7 @@ LiquidCrystal_I2C lcd(ADDRESS_I2C_LCD, 20, 4);
 enum item_mode_lcd
 {
   JOYSTICK,
+  JOYSTICK_CURVE,
   FEEDBACK,
   PINOUT,
 };
@@ -95,6 +100,15 @@ int last_mode_print_lcd = -1;
 static int32_t last_print_lcd_time = 0;
 
 bool connection_lcd = LOW;
+
+Polynomial curve_positiv(2, 3); //Polynome du second degrée , nombre de points
+Polynomial curve_negativ(2, 3); //Polynome du second degrée , nombre de points
+
+double coordonee_X_positiv[] = {0, 500, 1000};
+double coordonee_Y_positiv[] = {0, 250, 1000};
+
+double coordonee_X_negativ[] = {0, -500, -1000};
+double coordonee_Y_negativ[] = {0, -250, -1000};
 
 // ***********************************************************************
 // ****************   Inclusion des sous programmes   ********************
@@ -124,20 +138,33 @@ void setup()
   scann_i2c();
 
   init_eeprom();
+
   setup_Lcd();
 
-  Serial.println(F(" init port"));
-  /* Initialisation des ports du joystick
-   *  Ports en entrées, activer les pull-ups
-   */
-  DDRD &= 3;
-  PORTD |= 0xFC;
-  DDRB &= 0xFE;
-  PORTB |= 0x01;
+  init_button();
 
   init_nrf(nRF_robot_address, nRF_joystick_address);
 
   init_buzzer();
+
+  curve_positiv.calcul_coef(coordonee_X_positiv, coordonee_Y_positiv);
+  curve_negativ.calcul_coef(coordonee_X_negativ, coordonee_Y_negativ);
+  
+  Serial.print("a = ");
+  Serial.println(curve_positiv.Get_coeficient(2), 15);
+  Serial.print("b = ");
+  Serial.println(curve_positiv.Get_coeficient(1), 15);
+  Serial.print("c = ");
+  Serial.println(curve_positiv.Get_coeficient(0), 15);
+
+  Serial.print("a = ");
+  Serial.println(curve_negativ.Get_coeficient(2), 15);
+  Serial.print("b = ");
+  Serial.println(curve_negativ.Get_coeficient(1), 15);
+  Serial.print("c = ");
+  Serial.println(curve_negativ.Get_coeficient(0), 15);
+
+
 }
 
 // ***********************************************************************
@@ -159,7 +186,7 @@ void loop()
   {
     if (millis() - last_ack_send_data_time > 150)
     {
-      tone(PIN_buzzer, 900);
+      tone(PIN_buzzer, 600);
     }
   }
   else
@@ -167,7 +194,6 @@ void loop()
     noTone(PIN_buzzer);
     last_ack_send_data_time = millis();
   }
-  
 
   nrf_receive_data();
 
