@@ -27,6 +27,9 @@ const byte nRF_joystick_address[6] = "EFgh1";
 #define HOVER_SERIAL_RX_PIN A3 //ancienement 2
 #define HOVER_SERIAL_TX_PIN 4
 
+#define WEAPON_EN_PIN 5
+#define WEAPON_DIR_PIN 6
+
 // https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
 
 // ***********************************************************************
@@ -115,10 +118,8 @@ static int32_t last_joystick_time = 0;
 
 void setup()
 {
-  pinMode(A0, OUTPUT);
-  pinMode(A1, OUTPUT);
-  pinMode(A2, OUTPUT);
-  //pinMode(A3, OUTPUT);
+  pinMode(WEAPON_EN_PIN, OUTPUT);
+  pinMode(WEAPON_DIR_PIN, OUTPUT);
 
   Serial.begin(SERIAL_BAUD);
   Serial.print(F("nRF24L01+ Robot\nVersion : "));
@@ -172,10 +173,8 @@ void loop()
   Serial.print("\t\tthrottle = ");
   Serial.println(throttle);*/
 
-    digitalWrite(A0, joystate.buttons & button_mask_up);
-    digitalWrite(A1, joystate.buttons & button_mask_right);
-    digitalWrite(A2, joystate.buttons & button_mask_down);
-  //digitalWrite(A3, joystate.buttons & button_mask_left);
+    digitalWrite(WEAPON_EN_PIN, joystate.buttons & button_mask_down);
+    digitalWrite(WEAPON_DIR_PIN, joystate.buttons & button_mask_right);
 
     last_joystick_time = millis();
   }
@@ -185,10 +184,8 @@ void loop()
   if (millis() - last_joystick_time > 500)
   {
     //Serial.println("No joystick data !");
-    digitalWrite(A0, LOW);
-    digitalWrite(A1, LOW);
-    digitalWrite(A2, LOW);
-    //digitalWrite(A3, LOW);
+    digitalWrite(WEAPON_EN_PIN, LOW);
+    digitalWrite(WEAPON_DIR_PIN, LOW);
     hoverserial_send(0, 0);
   }
  hoverserial_receive();
