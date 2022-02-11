@@ -158,10 +158,10 @@ void loop()
 
   if (nrf_receive_data())
   {
-    Serial.print("steer = ");
+    /*Serial.print("steer = ");
     Serial.print(joystate.axis_x);
     Serial.print("\t\tspeed = ");
-    Serial.println(joystate.axis_y);
+    Serial.println(joystate.axis_y);*/
 
     int steering = deadZone(joystate.axis_x, 20);
     int throttle = deadZone(joystate.axis_y , 20);
@@ -193,6 +193,6 @@ void loop()
   }
  hoverserial_receive();
 
-  Serial.print(F("temp loop ="));
-  Serial.println(String(millis() - start_millis_loop));
+  /*Serial.print(F("temp loop ="));
+  Serial.println(String(millis() - start_millis_loop));*/
 }

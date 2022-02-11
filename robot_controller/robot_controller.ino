@@ -184,9 +184,9 @@ void loop()
 
   if (!nrf_send_data())
   {
-    if (millis() - last_ack_send_data_time > 150)
+    if (millis() - last_ack_send_data_time > 200)
     {
-      tone(PIN_buzzer, 600);
+      bip_buzzer(1200,200);
     }
   }
   else
