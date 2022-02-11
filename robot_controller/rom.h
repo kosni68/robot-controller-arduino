@@ -140,7 +140,7 @@ void read_eeprom()
   
   EEPROM.get(byte_position, send_value_speed_max);
   byte_position+=sizeof(send_value_speed_max);
-  
+
 }
 
 void init_eeprom()

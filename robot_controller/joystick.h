@@ -39,21 +39,26 @@ void read_joystick()
   {
     speed = scaling(speed_read, joystick_speed_min, joystick_speed_middle, joystick_speed_max, send_value_speed_min, send_value_speed_max);
     if (speed > 0)
-      joystate.speed_send = curve_positiv.resultat(speed);
+      joystate.speed_send = curve_positiv_speed.resultat(speed);
     else
-      joystate.speed_send = curve_negativ.resultat(speed);
+      joystate.speed_send = curve_negativ_speed.resultat(speed);
 
     steer = scaling(steer_read, joystick_steer_min, joystick_steer_middle, joystick_steer_max, send_value_steer_min, send_value_steer_max);
     if (steer > 0)
-      joystate.steer_send = curve_positiv.resultat(steer);
+      joystate.steer_send = curve_positiv_steer.resultat(steer);
     else
-      joystate.steer_send = curve_negativ.resultat(steer);
+      joystate.steer_send = curve_negativ_steer.resultat(steer);
   }
   else
   {
     joystate.speed_send = speed_read;
     joystate.steer_send = steer_read;
   }
+
+  if (joystate.speed_send <= coordonee_Y_positiv_speed[0] && joystate.speed_send >= coordonee_Y_negativ_speed[0])
+    joystate.speed_send = 0;
+  if (joystate.steer_send <= coordonee_Y_positiv_steer[0] && joystate.steer_send >= coordonee_Y_negativ_steer[0])
+    joystate.steer_send = 0;
 
   if (inverse_speed)
     joystate.speed_send = -joystate.speed_send;
