@@ -10,3 +10,7 @@ the controller uses an i2c lcd screen for print joystick value and robot feedbac
 • Firmware hack the hoverboard find this Link : https://github.com/EFeru/hoverboard-firmware-hack-FOC
 
 • This variant Usart must be used to control the board : https://github.com/EFeru/hoverboard-firmware-hack-FOC/wiki/Variant-USART
+
+# TODO liste
+
+• deadzone parametrable
