@@ -107,18 +107,21 @@ Polynomial curve_negativ_speed(2, 3); //Polynome du second degrée , nombre de p
 Polynomial curve_positiv_steer(2, 3); //Polynome du second degrée , nombre de points
 Polynomial curve_negativ_steer(2, 3); //Polynome du second degrée , nombre de points
 
-double coordonee_X_positiv_speed[] = {0, 500, 1000};
-double coordonee_Y_positiv_speed[] = {120, 400, 1000};
+//double coordonee_X_positiv_speed[] = {0, 500, 1000};
+//double coordonee_Y_positiv_speed[] = {120, 400, 1000};
 
-double coordonee_X_negativ_speed[] = {0, -500, -1000};
-double coordonee_Y_negativ_speed[] = {-120, -400, -1000};
+double coordonee_X_positiv_speed[] = {0, 400, 1000};
+double coordonee_Y_positiv_speed[] = {120, 280, 1000};
+
+double coordonee_X_negativ_speed[] = {0, -400, -1000};
+double coordonee_Y_negativ_speed[] = {-120, -280, -1000};
 
 
-double coordonee_X_positiv_steer[] = {0, 500, 1000};
-double coordonee_Y_positiv_steer[] = {0, 250, 1000};
+double coordonee_X_positiv_steer[] = {0, 400, 1000};
+double coordonee_Y_positiv_steer[] = {120, 280, 1000};
 
-double coordonee_X_negativ_steer[] = {0, -500, -1000};
-double coordonee_Y_negativ_steer[] = {0, -250, -1000};
+double coordonee_X_negativ_steer[] = {0, -400, -1000};
+double coordonee_Y_negativ_steer[] = {-120, -280, -1000};
 
 
 // ***********************************************************************
@@ -156,7 +159,7 @@ void setup()
 
   init_nrf(nRF_robot_address, nRF_joystick_address);
 
-  //init_buzzer();
+  init_buzzer();
 
   curve_positiv_speed.calcul_coef(coordonee_X_positiv_speed, coordonee_Y_positiv_speed);
   curve_negativ_speed.calcul_coef(coordonee_X_negativ_speed, coordonee_Y_negativ_speed);
@@ -200,7 +203,7 @@ void loop()
   {
     if (millis() - last_ack_send_data_time > 200)
     {
-      //bip_buzzer(1200,200);
+      bip_buzzer(1200,200);
     }
   }
   else
