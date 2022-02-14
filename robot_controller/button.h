@@ -44,7 +44,7 @@ void read_button()
     if (joystate.buttons & button_mask_up)
         Serial.println(F("UP "));
     if (joystate.buttons & button_mask_right)
-        Serial.println(F("RIGHT "));
+        //Serial.println(F("RIGHT "));
     if (joystate.buttons & button_mask_down)
         Serial.println(F("DOWN "));
     if (joystate.buttons & button_mask_left)

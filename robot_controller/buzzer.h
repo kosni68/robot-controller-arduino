@@ -17,7 +17,7 @@ void init_buzzer()
 void bip_buzzer(unsigned int interval_off,unsigned int interval_on)
 {
 
-   Serial.print(millis() - last_bip_buzzer_time);
+   //Serial.print(millis() - last_bip_buzzer_time);
 
    if (millis() - last_bip_buzzer_time > interval_off && millis() - last_bip_buzzer_time < interval_off+interval_on)
       tone(PIN_buzzer, 200);
