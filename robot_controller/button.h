@@ -41,12 +41,7 @@ void read_button()
     if (PINB & B00000001)
         joystate.buttons &= ~button_mask_joystick;
 
-    if (joystate.buttons & button_mask_up)
-        Serial.println(F("UP "));
-    if (joystate.buttons & button_mask_right)
-        //Serial.println(F("RIGHT "));
-    if (joystate.buttons & button_mask_down)
-        Serial.println(F("DOWN "));
+
     if (joystate.buttons & button_mask_left)
     {
         Serial.println(F("LEFT "));
@@ -55,14 +50,24 @@ void read_button()
         {
             mode_print_lcd++;
             // overflow(mode_print_lcd, 0, sizeof(enum item_mode_lcd) - 1);
-            overflow(mode_print_lcd, 0, 3);
+            overflow(mode_print_lcd, 0, 2);
             last_button_time = millis();
         }
     }
+
+/*
+    if (joystate.buttons & button_mask_up)
+        Serial.println(F("UP "));
+    if (joystate.buttons & button_mask_right)
+        Serial.println(F("RIGHT "));
+    if (joystate.buttons & button_mask_down)
+        Serial.println(F("DOWN "));
     if (joystate.buttons & button_mask_start)
         Serial.println(F("START "));
     if (joystate.buttons & button_mask_select)
         Serial.println(F("SELECT "));
     if (joystate.buttons & button_mask_joystick)
         Serial.println(F("JOYSTICK "));
+        
+        */
 }

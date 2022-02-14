@@ -2,12 +2,12 @@
 // ***************************    LCD    *********************************
 // ***********************************************************************
 
-uint8_t battery_0[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1F};
-uint8_t battery_20[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x11, 0x1F, 0x1F};
-uint8_t battery_40[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x1F, 0x1F, 0x1F};
-uint8_t battery_60[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
-uint8_t battery_80[8]  = {0x0E, 0x1B, 0x11, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F};
-uint8_t battery_100[8]  = {0x0E, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F};
+uint8_t battery_0[8] = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1F};
+uint8_t battery_20[8] = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x11, 0x1F, 0x1F};
+uint8_t battery_40[8] = {0x0E, 0x1B, 0x11, 0x11, 0x11, 0x1F, 0x1F, 0x1F};
+uint8_t battery_60[8] = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
+uint8_t battery_80[8] = {0x0E, 0x1B, 0x11, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F};
+uint8_t battery_100[8] = {0x0E, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F};
 
 enum item_battery_lcd
 {
@@ -17,7 +17,7 @@ enum item_battery_lcd
   BATTERY_60,
   BATTERY_80,
   BATTERY_100,
-}; 
+};
 
 bool init_lcd()
 {
@@ -59,6 +59,19 @@ void setup_Lcd()
   lcd.createChar(BATTERY_60, battery_60);
   lcd.createChar(BATTERY_80, battery_80);
   lcd.createChar(BATTERY_100, battery_100);
+
+  lcd.setCursor(14, 0);
+  lcd.write(BATTERY_0);
+  lcd.setCursor(15, 0);
+  lcd.write(BATTERY_20);
+  lcd.setCursor(16, 0);
+  lcd.write(BATTERY_40);
+  lcd.setCursor(17, 0);
+  lcd.write(BATTERY_60);
+  lcd.setCursor(18, 0);
+  lcd.write(BATTERY_80);
+  lcd.setCursor(19, 0);
+  lcd.write(BATTERY_100);
 }
 
 String str_lcd(int var, byte size)
@@ -83,73 +96,33 @@ void print_lcd_joy()
     lcd.clear();
     lcd.backlight();
     lcd.setCursor(0, 0);
-    lcd.print("Joystick");
-    lcd.setCursor(14, 0);
-    lcd.write(BATTERY_0); 
-    lcd.setCursor(15, 0);
-    lcd.write(BATTERY_20); 
-    lcd.setCursor(16, 0);
-    lcd.write(BATTERY_40); 
-    lcd.setCursor(17, 0);
-    lcd.write(BATTERY_60); 
-    lcd.setCursor(18, 0);
-    lcd.write(BATTERY_80); 
-    lcd.setCursor(19, 0);
-    lcd.write(BATTERY_100); 
-    lcd.setCursor(7, 1);
+    lcd.print("Speed/Steer");
+    lcd.setCursor(0, 1);
     lcd.print("read:");
+    lcd.setCursor(7, 1);
+    lcd.print("scale:");
     lcd.setCursor(14, 1);
     lcd.print("send:");
-    lcd.setCursor(0, 2);
-    lcd.print("Speed:");
-    lcd.setCursor(0, 3);
-    lcd.print("Steer:");
 
     last_mode_print_lcd = mode_print_lcd;
   }
 
-  lcd.setCursor(7, 2);
+  lcd.setCursor(0, 2);
   lcd.print(str_lcd(speed_read, 6));
-  lcd.setCursor(7, 3);
+  lcd.setCursor(0, 3);
   lcd.print(str_lcd(steer_read, 6));
 
-  lcd.setCursor(14, 2);
-  lcd.print(str_lcd(joystate.speed_send, 6));
-  lcd.setCursor(14, 3);
-  lcd.print(str_lcd(joystate.steer_send, 6));
-}
-
-void print_lcd_joy_curve()
-{
-
-  if (last_mode_print_lcd != mode_print_lcd)
-  {
-    lcd.clear();
-    lcd.backlight();
-    lcd.setCursor(0, 0);
-    lcd.print("Joystick curve");
-    lcd.setCursor(7, 1);
-    lcd.print("ax+b:");
-    lcd.setCursor(14, 1);
-    lcd.print("ax2+bx:");
-    lcd.setCursor(0, 2);
-    lcd.print("Speed:");
-    lcd.setCursor(0, 3);
-    lcd.print("Steer:");
-
-    last_mode_print_lcd = mode_print_lcd;
-  }
-
   lcd.setCursor(7, 2);
-  lcd.print(str_lcd(speed, 6));
+  lcd.print(str_lcd(speed_scale, 6));
   lcd.setCursor(7, 3);
-  lcd.print(str_lcd(steer, 6));
+  lcd.print(str_lcd(steer_scale, 6));
 
   lcd.setCursor(14, 2);
   lcd.print(str_lcd(joystate.speed_send, 6));
   lcd.setCursor(14, 3);
   lcd.print(str_lcd(joystate.steer_send, 6));
 }
+
 
 void print_lcd_feedback()
 {
@@ -206,7 +179,7 @@ void print_lcd_pinout()
     lcd.setCursor(11, 2);
     lcd.print("Lcd: 0x");
     lcd.setCursor(18, 2);
-    lcd.print(ADDRESS_I2C_LCD,HEX);
+    lcd.print(ADDRESS_I2C_LCD, HEX);
 
     last_mode_print_lcd = mode_print_lcd;
   }
@@ -214,41 +187,41 @@ void print_lcd_pinout()
 
 void print_lcd_cal_no_move()
 {
-    lcd.clear();
-    lcd.backlight();
-    lcd.setCursor(5, 0);
-    lcd.print("*********");
-    lcd.setCursor(1, 1);
-    lcd.print("No move joystick");
-    lcd.setCursor(5, 2);
-    lcd.print("*********");
-    last_mode_print_lcd = -1;
+  lcd.clear();
+  lcd.backlight();
+  lcd.setCursor(5, 0);
+  lcd.print("*********");
+  lcd.setCursor(1, 1);
+  lcd.print("No move joystick");
+  lcd.setCursor(5, 2);
+  lcd.print("*********");
+  last_mode_print_lcd = -1;
 }
 
 void print_lcd_cal_move_speed()
 {
-    lcd.clear();
-    lcd.backlight();
-    lcd.setCursor(5, 0);
-    lcd.print("*** ! ***");
-    lcd.setCursor(0, 1);
-    lcd.print("Move speed joystick");
-    lcd.setCursor(5, 2);
-    lcd.print("*** ! ***");
-    last_mode_print_lcd = -1;
+  lcd.clear();
+  lcd.backlight();
+  lcd.setCursor(5, 0);
+  lcd.print("*** ! ***");
+  lcd.setCursor(0, 1);
+  lcd.print("Move speed joystick");
+  lcd.setCursor(5, 2);
+  lcd.print("*** ! ***");
+  last_mode_print_lcd = -1;
 }
 
 void print_lcd_cal_move_steer()
 {
-    lcd.clear();
-    lcd.backlight();
-    lcd.setCursor(5, 0);
-    lcd.print(" <<--->> ");
-    lcd.setCursor(0, 1);
-    lcd.print("Move steer joystick");
-    lcd.setCursor(5, 2);
-    lcd.print(" <<--->> ");
-    last_mode_print_lcd = -1;
+  lcd.clear();
+  lcd.backlight();
+  lcd.setCursor(5, 0);
+  lcd.print(" <<--->> ");
+  lcd.setCursor(0, 1);
+  lcd.print("Move steer joystick");
+  lcd.setCursor(5, 2);
+  lcd.print(" <<--->> ");
+  last_mode_print_lcd = -1;
 }
 
 void print_lcd()
@@ -259,10 +232,6 @@ void print_lcd()
     {
     case JOYSTICK:
       print_lcd_joy();
-      break;
-
-    case JOYSTICK_CURVE:
-      print_lcd_joy_curve();
       break;
 
     case FEEDBACK:
@@ -276,6 +245,6 @@ void print_lcd()
     default:
       break;
     }
-    last_print_lcd_time=millis();
+    last_print_lcd_time = millis();
   }
 }

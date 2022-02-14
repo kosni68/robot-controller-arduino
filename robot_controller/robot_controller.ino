@@ -9,7 +9,6 @@
 #include "printf.h"
 #include <EEPROM.h>
 #include <LiquidCrystal_I2C.h>
-#include "Polynomial.h"
 
 // ***********************************************************************
 // ************************     CONSTANTES    ****************************
@@ -43,8 +42,8 @@ bool inverse_speed = LOW;
 bool inverse_steer = LOW;
 bool inverse_send_speed_steer = LOW;
 
-int speed;
-int steer;
+int speed_scale=0;
+int steer_scale=0;
 
 int joystick_speed_min;
 int joystick_speed_middle;
@@ -90,7 +89,6 @@ LiquidCrystal_I2C lcd(ADDRESS_I2C_LCD, 20, 4);
 enum item_mode_lcd
 {
   JOYSTICK,
-  JOYSTICK_CURVE,
   FEEDBACK,
   PINOUT,
 };
@@ -101,27 +99,13 @@ static int32_t last_print_lcd_time = 0;
 
 bool connection_lcd = LOW;
 
-Polynomial curve_positiv_speed(2, 3); //Polynome du second degrée , nombre de points
-Polynomial curve_negativ_speed(2, 3); //Polynome du second degrée , nombre de points
+// coordonee abscisse et ordonnee
 
-Polynomial curve_positiv_steer(2, 3); //Polynome du second degrée , nombre de points
-Polynomial curve_negativ_steer(2, 3); //Polynome du second degrée , nombre de points
+int x_speed[] = {0, 700, 1000};
+int y_speed[] = {120, 300, 1000};
 
-//double coordonee_X_positiv_speed[] = {0, 500, 1000};
-//double coordonee_Y_positiv_speed[] = {120, 400, 1000};
-
-double coordonee_X_positiv_speed[] = {0, 400, 1000};
-double coordonee_Y_positiv_speed[] = {120, 280, 1000};
-
-double coordonee_X_negativ_speed[] = {0, -400, -1000};
-double coordonee_Y_negativ_speed[] = {-120, -280, -1000};
-
-
-double coordonee_X_positiv_steer[] = {0, 400, 1000};
-double coordonee_Y_positiv_steer[] = {120, 280, 1000};
-
-double coordonee_X_negativ_steer[] = {0, -400, -1000};
-double coordonee_Y_negativ_steer[] = {-120, -280, -1000};
+int x_steer[] = {0, 700, 1000};
+int y_steer[] = {120, 300, 1000};
 
 
 // ***********************************************************************
@@ -160,28 +144,15 @@ void setup()
   init_nrf(nRF_robot_address, nRF_joystick_address);
 
   init_buzzer();
-
+  
+/*
   curve_positiv_speed.calcul_coef(coordonee_X_positiv_speed, coordonee_Y_positiv_speed);
   curve_negativ_speed.calcul_coef(coordonee_X_negativ_speed, coordonee_Y_negativ_speed);
 
   curve_positiv_steer.calcul_coef(coordonee_X_positiv_steer, coordonee_Y_positiv_steer);
   curve_negativ_steer.calcul_coef(coordonee_X_negativ_steer, coordonee_Y_negativ_steer);
+  */
   
-  Serial.print("a = ");
-  Serial.println(curve_positiv_speed.Get_coeficient(2), 15);
-  Serial.print("b = ");
-  Serial.println(curve_positiv_speed.Get_coeficient(1), 15);
-  Serial.print("c = ");
-  Serial.println(curve_positiv_speed.Get_coeficient(0), 15);
-
-  Serial.print("a = ");
-  Serial.println(curve_negativ_speed.Get_coeficient(2), 15);
-  Serial.print("b = ");
-  Serial.println(curve_negativ_speed.Get_coeficient(1), 15);
-  Serial.print("c = ");
-  Serial.println(curve_negativ_speed.Get_coeficient(0), 15);
-
-
 }
 
 // ***********************************************************************
@@ -213,7 +184,7 @@ void loop()
   }
 
   nrf_receive_data();
-  
+
   delay(5);
 
   /*Serial.print(F("temp loop ="));
