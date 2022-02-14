@@ -14,6 +14,8 @@ void variable_default()
   inverse_send_speed_steer = LOW;
   correction_scale = HIGH;
 
+  joystick_deadzone=30;
+
   joystick_speed_min = 0;
   joystick_speed_middle = 512;
   joystick_speed_max = 1023;
@@ -22,11 +24,22 @@ void variable_default()
   joystick_steer_middle = 512;
   joystick_steer_max = 1023;
 
-  send_value_steer_min = -1000;
-  send_value_steer_max = 1000;
+  x_speed[0] = 0;
+  x_speed[1] = 700;
+  x_speed[2] = 1000;
+  
+  y_speed[0] = 120;
+  y_speed[1] = 300;
+  y_speed[2] = 1000;
 
-  send_value_speed_min = -1000;
-  send_value_speed_max = 1000;
+  x_steer[0] = 0;
+  x_steer[1] = 700;
+  x_steer[2] = 1000;
+  
+  y_steer[0] = 120;
+  y_steer[1] = 300;
+  y_steer[2] = 1000;
+
 }
 
 void save_eeprom()
@@ -34,56 +47,82 @@ void save_eeprom()
   byte byte_position = 1;
 
   EEPROM.put(byte_position, PIN_joystick_speed);
-  byte_position+=sizeof(PIN_joystick_speed);
+  byte_position += sizeof(PIN_joystick_speed);
 
   EEPROM.put(byte_position, PIN_joystick_steer);
-  byte_position+=sizeof(PIN_joystick_steer);
+  byte_position += sizeof(PIN_joystick_steer);
 
   EEPROM.put(byte_position, PIN_buzzer);
-  byte_position+=sizeof(PIN_buzzer);
+  byte_position += sizeof(PIN_buzzer);
 
   EEPROM.put(byte_position, inverse_speed);
-  byte_position+=sizeof(inverse_speed);
+  byte_position += sizeof(inverse_speed);
 
   EEPROM.put(byte_position, inverse_steer);
-  byte_position+=sizeof(inverse_steer);
+  byte_position += sizeof(inverse_steer);
 
   EEPROM.put(byte_position, correction_scale);
-  byte_position+=sizeof(correction_scale);
+  byte_position += sizeof(correction_scale);
 
   EEPROM.put(byte_position, inverse_send_speed_steer);
-  byte_position+=sizeof(inverse_send_speed_steer);
+  byte_position += sizeof(inverse_send_speed_steer);
+
+  EEPROM.put(byte_position, joystick_deadzone);
+  byte_position += sizeof(joystick_deadzone);
 
   EEPROM.put(byte_position, joystick_speed_min);
-  byte_position+=sizeof(joystick_speed_min);
+  byte_position += sizeof(joystick_speed_min);
 
   EEPROM.put(byte_position, joystick_speed_middle);
-  byte_position+=sizeof(joystick_speed_middle);
+  byte_position += sizeof(joystick_speed_middle);
 
   EEPROM.put(byte_position, joystick_speed_max);
-  byte_position+=sizeof(joystick_speed_max);
+  byte_position += sizeof(joystick_speed_max);
 
   EEPROM.put(byte_position, joystick_steer_min);
-  byte_position+=sizeof(joystick_steer_min);
+  byte_position += sizeof(joystick_steer_min);
 
   EEPROM.put(byte_position, joystick_steer_middle);
-  byte_position+=sizeof(joystick_steer_middle);
+  byte_position += sizeof(joystick_steer_middle);
 
   EEPROM.put(byte_position, joystick_steer_max);
-  byte_position+=sizeof(joystick_steer_max);
+  byte_position += sizeof(joystick_steer_max);
 
-  EEPROM.put(byte_position, send_value_steer_min);
-  byte_position+=sizeof(send_value_steer_min);
+  EEPROM.put(byte_position, x_speed[0]);
+  byte_position += sizeof(x_speed[0]);
 
-  EEPROM.put(byte_position, send_value_steer_max);
-  byte_position+=sizeof(send_value_steer_max);
+  EEPROM.put(byte_position, x_speed[1]);
+  byte_position += sizeof(x_speed[1]);
 
-  EEPROM.put(byte_position, send_value_speed_min);
-  byte_position+=sizeof(send_value_speed_min);
+  EEPROM.put(byte_position, x_speed[2]);
+  byte_position += sizeof(x_speed[2]);
 
-  EEPROM.put(byte_position, send_value_speed_max);
-  byte_position+=sizeof(send_value_speed_max);
+  EEPROM.put(byte_position, y_speed[0]);
+  byte_position += sizeof(y_speed[0]);
 
+  EEPROM.put(byte_position, y_speed[1]);
+  byte_position += sizeof(y_speed[1]);
+
+  EEPROM.put(byte_position, y_speed[2]);
+  byte_position += sizeof(y_speed[2]);
+
+  EEPROM.put(byte_position, x_steer[0]);
+  byte_position += sizeof(x_steer[0]);
+
+  EEPROM.put(byte_position, x_steer[1]);
+  byte_position += sizeof(x_steer[1]);
+
+  EEPROM.put(byte_position, x_steer[2]);
+  byte_position += sizeof(x_steer[2]);
+
+  EEPROM.put(byte_position, y_steer[0]);
+  byte_position += sizeof(y_steer[0]);
+
+  EEPROM.put(byte_position, y_steer[1]);
+  byte_position += sizeof(y_steer[1]);
+
+  EEPROM.put(byte_position, y_steer[2]);
+  byte_position += sizeof(y_steer[2]);
 }
 
 void read_eeprom()
@@ -91,56 +130,82 @@ void read_eeprom()
   byte byte_position = 1;
 
   EEPROM.get(byte_position, PIN_joystick_speed);
-  byte_position+=sizeof(PIN_joystick_speed);
+  byte_position += sizeof(PIN_joystick_speed);
 
   EEPROM.get(byte_position, PIN_joystick_steer);
-  byte_position+=sizeof(PIN_joystick_steer);
-  
+  byte_position += sizeof(PIN_joystick_steer);
+
   EEPROM.get(byte_position, PIN_buzzer);
-  byte_position+=sizeof(PIN_buzzer);
-  
+  byte_position += sizeof(PIN_buzzer);
+
   EEPROM.get(byte_position, inverse_speed);
-  byte_position+=sizeof(inverse_speed);
-  
+  byte_position += sizeof(inverse_speed);
+
   EEPROM.get(byte_position, inverse_steer);
-  byte_position+=sizeof(inverse_steer);
-  
+  byte_position += sizeof(inverse_steer);
+
   EEPROM.get(byte_position, correction_scale);
-  byte_position+=sizeof(correction_scale);
-  
+  byte_position += sizeof(correction_scale);
+
   EEPROM.get(byte_position, inverse_send_speed_steer);
-  byte_position+=sizeof(inverse_send_speed_steer);
-  
+  byte_position += sizeof(inverse_send_speed_steer);
+
   EEPROM.get(byte_position, joystick_speed_min);
-  byte_position+=sizeof(joystick_speed_min);
+  byte_position += sizeof(joystick_speed_min);
   
+  EEPROM.get(byte_position, joystick_deadzone);
+  byte_position += sizeof(joystick_deadzone);
+
   EEPROM.get(byte_position, joystick_speed_middle);
-  byte_position+=sizeof(joystick_speed_middle);
-  
+  byte_position += sizeof(joystick_speed_middle);
+
   EEPROM.get(byte_position, joystick_speed_max);
-  byte_position+=sizeof(joystick_speed_max);
-  
+  byte_position += sizeof(joystick_speed_max);
+
   EEPROM.get(byte_position, joystick_steer_min);
-  byte_position+=sizeof(joystick_steer_min);
-  
+  byte_position += sizeof(joystick_steer_min);
+
   EEPROM.get(byte_position, joystick_steer_middle);
-  byte_position+=sizeof(joystick_steer_middle);
-  
+  byte_position += sizeof(joystick_steer_middle);
+
   EEPROM.get(byte_position, joystick_steer_max);
-  byte_position+=sizeof(joystick_steer_max);
-  
-  EEPROM.get(byte_position, send_value_steer_min);
-  byte_position+=sizeof(send_value_steer_min);
-  
-  EEPROM.get(byte_position, send_value_steer_max);
-  byte_position+=sizeof(send_value_steer_max);
+  byte_position += sizeof(joystick_steer_max);
 
-  EEPROM.get(byte_position, send_value_speed_min);
-  byte_position+=sizeof(send_value_speed_min);
-  
-  EEPROM.get(byte_position, send_value_speed_max);
-  byte_position+=sizeof(send_value_speed_max);
+  EEPROM.get(byte_position, x_speed[0]);
+  byte_position += sizeof(x_speed[0]);
 
+  EEPROM.get(byte_position, x_speed[1]);
+  byte_position += sizeof(x_speed[1]);
+
+  EEPROM.get(byte_position, x_speed[2]);
+  byte_position += sizeof(x_speed[2]);
+
+  EEPROM.get(byte_position, y_speed[0]);
+  byte_position += sizeof(y_speed[0]);
+
+  EEPROM.get(byte_position, y_speed[1]);
+  byte_position += sizeof(y_speed[1]);
+
+  EEPROM.get(byte_position, y_speed[2]);
+  byte_position += sizeof(y_speed[2]);
+
+  EEPROM.get(byte_position, x_steer[0]);
+  byte_position += sizeof(x_steer[0]);
+
+  EEPROM.get(byte_position, x_steer[1]);
+  byte_position += sizeof(x_steer[1]);
+
+  EEPROM.get(byte_position, x_steer[2]);
+  byte_position += sizeof(x_steer[2]);
+
+  EEPROM.get(byte_position, y_steer[0]);
+  byte_position += sizeof(y_steer[0]);
+
+  EEPROM.get(byte_position, y_steer[1]);
+  byte_position += sizeof(y_steer[1]);
+
+  EEPROM.get(byte_position, y_steer[2]);
+  byte_position += sizeof(y_steer[2]);
 }
 
 void init_eeprom()

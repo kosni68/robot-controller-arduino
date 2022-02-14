@@ -4,7 +4,7 @@
 
 int scaling_false_curve(int value, int x_value_min, int x_value_middle, int x_value_max, int y_value_min, int y_value_middle, int y_value_max)
 {
-  // x = abscisse , y = ordonnée
+  // x = abscissa  , y = ordinate
 
   if (value >= x_value_min && value <= x_value_middle)
     return map(value, x_value_min, x_value_middle, y_value_min, y_value_middle);
@@ -16,11 +16,10 @@ int scaling_false_curve(int value, int x_value_min, int x_value_middle, int x_va
 // ***************************    SCALING    *****************************
 // ***********************************************************************
 
-int scaling(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max, int min, int maximum)
+int scaling(int analogread, int analogread_value_min, int analogread_value_middle, int analogread_value_max, int min, int maximum,int deadzone)
 {
   int return_value;
   int middle = 0;
-  int deadzone = 30;
 
   return_value = middle;
 
@@ -51,14 +50,14 @@ void read_joystick()
 
   if (correction_scale)
   {
-    speed_scale = scaling(speed_read, joystick_speed_min, joystick_speed_middle, joystick_speed_max, send_value_speed_min, send_value_speed_max);
+    speed_scale = scaling(speed_read, joystick_speed_min, joystick_speed_middle, joystick_speed_max, -1000, 1000,joystick_deadzone);
 
     if (speed_scale > 0)
       joystate.speed_send = scaling_false_curve(speed_scale, x_speed[0], x_speed[1], x_speed[2], y_speed[0], y_speed[1], y_speed[2]);
     else
       joystate.speed_send = -scaling_false_curve(-speed_scale, x_speed[0], x_speed[1], x_speed[2], y_speed[0], y_speed[1], y_speed[2]);
 
-    steer_scale = scaling(steer_read, joystick_steer_min, joystick_steer_middle, joystick_steer_max, send_value_steer_min, send_value_steer_max);
+    steer_scale = scaling(steer_read, joystick_steer_min, joystick_steer_middle, joystick_steer_max, -1000, 1000,joystick_deadzone);
 
     if (steer_scale > 0)
       joystate.steer_send = scaling_false_curve(steer_scale, x_steer[0], x_steer[1], x_steer[2], y_steer[0], y_steer[1], y_steer[2]);

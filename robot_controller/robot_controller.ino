@@ -14,8 +14,8 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "1.0.6"
-#define value_to_init_eeprom 151 //change this value to erase default eeprom
+#define VERSION "1.0.7"
+#define value_to_init_eeprom 264 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
@@ -42,8 +42,10 @@ bool inverse_speed = LOW;
 bool inverse_steer = LOW;
 bool inverse_send_speed_steer = LOW;
 
-int speed_scale=0;
-int steer_scale=0;
+int speed_scale;
+int steer_scale;
+
+int joystick_deadzone;
 
 int joystick_speed_min;
 int joystick_speed_middle;
@@ -53,11 +55,13 @@ int joystick_steer_min;
 int joystick_steer_middle;
 int joystick_steer_max;
 
+/*
 int send_value_steer_min;
 int send_value_steer_max;
 
 int send_value_speed_min;
 int send_value_speed_max;
+*/
 
 bool correction_scale = LOW;
 
@@ -101,11 +105,11 @@ bool connection_lcd = LOW;
 
 // coordonee abscisse et ordonnee
 
-int x_speed[] = {0, 700, 1000};
-int y_speed[] = {120, 300, 1000};
+int x_speed[3];
+int y_speed[3];
 
-int x_steer[] = {0, 700, 1000};
-int y_steer[] = {120, 300, 1000};
+int x_steer[3];
+int y_steer[3];
 
 
 // ***********************************************************************
