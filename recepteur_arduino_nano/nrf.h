@@ -4,7 +4,7 @@ unsigned long last_send_data_time = 0;
 void nrf_send_data()
 {
 
-  if (millis() - last_send_data_time > 800)
+  if (millis() - last_send_data_time > 100)
   {
     nRF.stopListening();
 
@@ -57,7 +57,7 @@ void init_nrf(const byte tx_address[6], const byte rx_address[6])
 
   nRF.setChannel(104);         // valeur comprise entre 84 et 125
   nRF.setPALevel(RF24_PA_MAX); // RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX
-  nRF.setDataRate(RF24_1MBPS); // RF24_250KBPS, RF24_1MBPS, RF24_2MBPS
+  nRF.setDataRate(RF24_2MBPS); // RF24_250KBPS, RF24_1MBPS, RF24_2MBPS
 
   nRF.openWritingPipe(tx_address);
   nRF.openReadingPipe(1, rx_address);

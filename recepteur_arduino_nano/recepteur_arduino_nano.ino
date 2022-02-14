@@ -155,7 +155,7 @@ void loop()
 {
   unsigned long start_millis_loop = millis();
 
-  //nrf_send_data();
+  nrf_send_data();
 
   if (nrf_receive_data())
   {

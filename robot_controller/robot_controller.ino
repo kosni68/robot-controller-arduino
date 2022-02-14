@@ -213,6 +213,8 @@ void loop()
   }
 
   nrf_receive_data();
+  
+  delay(5);
 
   /*Serial.print(F("temp loop ="));
   Serial.println(String(millis() - start_millis_loop));*/
