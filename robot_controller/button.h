@@ -18,6 +18,7 @@ void init_button()
 
 void read_button()
 {
+    joystate.buttons = 0;
 
     if (!digitalRead(PIN_lcd_scroll))
     {
@@ -27,7 +28,7 @@ void read_button()
         {
             mode_print_lcd++;
             // overflow(mode_print_lcd, 0, sizeof(enum item_mode_lcd) - 1);
-            overflow(mode_print_lcd, 0, 2);
+            overflow(mode_print_lcd, 0, 3);
             last_button_time = millis();
         }
     }
@@ -35,12 +36,7 @@ void read_button()
     if (!digitalRead(PIN_weapon_enable))
     {
         Serial.println(F("PIN_weapon_enable "));
-
-        if (millis() - last_button_time > 400)
-        {
-            joystate.buttons & btn_weapon_enable;
-            last_button_time = millis();
-        }
+        joystate.buttons=joystate.buttons | btn_weapon_enable;
     }
     
 }

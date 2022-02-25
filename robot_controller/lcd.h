@@ -133,7 +133,6 @@ void print_lcd_joy()
   lcd.print(str_lcd(joystate.steer_send, 6));
 }
 
-
 void print_lcd_feedback()
 {
 
@@ -159,6 +158,33 @@ void print_lcd_feedback()
   lcd.print(str_lcd(robot_feedback.speedR_meas, 6));
   lcd.setCursor(16, 1);
   lcd.print(str_lcd(robot_feedback.speedL_meas, 6));
+}
+
+void print_lcd_weapon()
+{
+
+  if (last_mode_print_lcd != mode_print_lcd)
+  {
+    lcd.clear();
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("Weapon");
+    lcd.setCursor(0, 1);
+    lcd.print("Enable:");
+    lcd.setCursor(0, 2);
+    lcd.print("Speed:");
+
+    last_mode_print_lcd = mode_print_lcd;
+  }
+
+  lcd.setCursor(9, 1);
+  if (joystate.buttons & btn_weapon_enable)
+    lcd.print("HIGH");
+  else
+    lcd.print("LOW ");
+
+  lcd.setCursor(8, 2);
+  lcd.print(str_lcd(joystate.speed_weapon_send, 3));
 }
 
 void print_lcd_pinout()
@@ -252,6 +278,10 @@ void print_lcd()
     {
     case JOYSTICK:
       print_lcd_joy();
+      break;
+
+    case WEAPON:
+      print_lcd_weapon();
       break;
 
     case FEEDBACK:

@@ -15,7 +15,7 @@
 // ***********************************************************************
 
 #define VERSION "2.0"
-#define value_to_init_eeprom 274 //change this value to erase default eeprom
+#define value_to_init_eeprom 124 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
@@ -89,6 +89,7 @@ LiquidCrystal_I2C lcd(ADDRESS_I2C_LCD, 20, 4);
 enum item_mode_lcd
 {
   JOYSTICK,
+  WEAPON,
   FEEDBACK,
   PINOUT,
 };
