@@ -39,6 +39,12 @@ void read_serial()
       Serial.println(PIN_joystick_steer);
       Serial.print(F("$3 : PIN buzzer = "));
       Serial.println(PIN_buzzer);
+      Serial.print(F("$4 : PIN Weapon enable = "));
+      Serial.println(PIN_weapon_enable);
+      Serial.print(F("$5 : PIN Weapon speed = "));
+      Serial.println(PIN_weapon_speed);
+      Serial.print(F("$6 : PIN lcd scroll = "));
+      Serial.println(PIN_lcd_scroll);
 
       Serial.println(F("\n***** Enable/disable : *****"));
       Serial.print(F("$10 : inverse speed = "));
@@ -195,6 +201,27 @@ void read_serial()
         PIN_buzzer = mot_recu.toInt();
         Serial.print(F("PIN_buzzer :"));
         Serial.println(PIN_buzzer);
+      }
+      else if (mot_recu.indexOf("$4=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_weapon_enable = mot_recu.toInt();
+        Serial.print(F("PIN_weapon_enable :"));
+        Serial.println(PIN_weapon_enable);
+      }
+      else if (mot_recu.indexOf("$5=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_weapon_speed = mot_recu.toInt();
+        Serial.print(F("PIN_weapon_speed :"));
+        Serial.println(PIN_weapon_speed);
+      }
+      else if (mot_recu.indexOf("$6=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_lcd_scroll = mot_recu.toInt();
+        Serial.print(F("PIN_lcd_scroll :"));
+        Serial.println(PIN_lcd_scroll);
       }
       else if (mot_recu.indexOf("$20=", 0) == 0)
       {

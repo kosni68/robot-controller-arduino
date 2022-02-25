@@ -13,5 +13,5 @@ the controller uses an i2c lcd screen for print joystick value and robot feedbac
 
 # TODO liste
 
-• Rajouter version sur écran de démarrage
+• compte a rebour calibration
 Créer une animation décorative au démarrage aussi

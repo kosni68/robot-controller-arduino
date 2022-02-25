@@ -14,8 +14,8 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "1.0.7"
-#define value_to_init_eeprom 264 //change this value to erase default eeprom
+#define VERSION "2.0"
+#define value_to_init_eeprom 274 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
@@ -33,6 +33,9 @@ const byte nRF_joystick_address[6] = "EFgh1";
 byte PIN_joystick_speed;
 byte PIN_joystick_steer;
 byte PIN_buzzer;
+byte PIN_weapon_enable;
+byte PIN_weapon_speed;
+byte PIN_lcd_scroll;
 
 bool serial_print = HIGH;
 unsigned long millis_serial_pause = 0;
@@ -55,14 +58,6 @@ int joystick_steer_min;
 int joystick_steer_middle;
 int joystick_steer_max;
 
-/*
-int send_value_steer_min;
-int send_value_steer_max;
-
-int send_value_speed_min;
-int send_value_speed_max;
-*/
-
 bool correction_scale = LOW;
 
 struct joystick_state
@@ -70,6 +65,7 @@ struct joystick_state
   byte buttons;
   int steer_send;
   int speed_send;
+  byte speed_weapon_send;
 } joystate;
 
 int steer_read;
@@ -149,14 +145,6 @@ void setup()
 
   init_buzzer();
   
-/*
-  curve_positiv_speed.calcul_coef(coordonee_X_positiv_speed, coordonee_Y_positiv_speed);
-  curve_negativ_speed.calcul_coef(coordonee_X_negativ_speed, coordonee_Y_negativ_speed);
-
-  curve_positiv_steer.calcul_coef(coordonee_X_positiv_steer, coordonee_Y_positiv_steer);
-  curve_negativ_steer.calcul_coef(coordonee_X_negativ_steer, coordonee_Y_negativ_steer);
-  */
-  
 }
 
 // ***********************************************************************
@@ -171,6 +159,7 @@ void loop()
   read_serial();
   serial_print_pause();
   read_joystick();
+  joystate.speed_weapon_send = map(analogRead(PIN_weapon_speed),0,1023,0,255);
   read_button();
   print_lcd();
 

@@ -27,7 +27,7 @@ const byte nRF_joystick_address[6] = "EFgh1";
 #define HOVER_SERIAL_RX_PIN A3 //ancienement 2
 #define HOVER_SERIAL_TX_PIN 4
 
-#define WEAPON_EN_PIN 5
+#define WEAPON_EN_PIN 3
 #define WEAPON_DIR_PIN 6
 
 // https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
@@ -39,36 +39,21 @@ const byte nRF_joystick_address[6] = "EFgh1";
 int throttle;
 int steering;
 
-/* Valeur des axes et boutons de la manette */
 struct joystick_state
 {
-  /* <buttons> stocke l'état des 7 boutons de la manette dans 1 octet.
-   *  chaque bit de <buttons> est mis à 1 si le bouton correspondant est pressé
-   *  Par exemple, pour vérifier si le bouton du haut est pressé, on utilise :
-   *  if (joystate.buttons & button_mask_up)
-   *  {
-   *    ...
-   *  }
-   */
   byte buttons;
-  /* <axis_x> est la valeur analogique de l'axe horizontal du joystick
-   *  La valeur est comprise entre 0 et 1023
-   *  0    : stick à gauche
-   *  1023 : stick à gauche
-   *  ~512 : stick au centre
-   */
-
-  int axis_x;
-  int axis_y;
+  int steer;
+  int speed;
+  byte speed_weapon;
 } joystate;
 
-const byte button_mask_up = 0x01;       /* Bouton haut ou A */
-const byte button_mask_right = 0x02;    /* Bouton droit ou B */
-const byte button_mask_down = 0x04;     /* Bouton bas ou C */
-const byte button_mask_left = 0x08;     /* Bouton gauche ou D */
-const byte button_mask_start = 0x10;    /* Bouton start ou E */
-const byte button_mask_select = 0x20;   /* Bouton select ou F */
-const byte button_mask_joystick = 0x40; /* Bouton sous le stick */
+#define btn_weapon_enable 0x01    //B00000001
+#define button_mask_right 0x02    //B00000010
+#define button_mask_down 0x04     //B00000100
+#define button_mask_left 0x08     //B00001000
+#define button_mask_start 0x10    //B00010000
+#define button_mask_select 0x20   //B00100000
+#define button_mask_joystick 0x40 //B01000000
 
 SoftwareSerial HoverSerial(HOVER_SERIAL_RX_PIN, HOVER_SERIAL_TX_PIN);
 
@@ -131,22 +116,6 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-int deadZone(int inval, int thres)
-{
-  if (inval > thres)
-  {
-    return inval - thres;
-  }
-  else if (inval < -thres)
-  {
-    return inval + thres;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
 // ***********************************************************************
 // ***********************     FUNCTION LOOP     *************************
 // ***********************************************************************
@@ -160,21 +129,14 @@ void loop()
   if (nrf_receive_data())
   {
     /*Serial.print("steer = ");
-    Serial.print(joystate.axis_x);
+    Serial.print(joystate.steer);
     Serial.print("\t\tspeed = ");
-    Serial.println(joystate.axis_y);*/
+    Serial.println(joystate.speed);*/
 
-    int steering = deadZone(joystate.axis_x, 20);
-    int throttle = deadZone(joystate.axis_y , 20);
+    hoverserial_send(joystate.steer, joystate.speed);
 
-    hoverserial_send(steering, throttle);
-    /*Serial.print("steering = ");
-  Serial.print(steering);
-  Serial.print("\t\tthrottle = ");
-  Serial.println(throttle);*/
-
-    digitalWrite(WEAPON_EN_PIN, joystate.buttons & button_mask_down);
-    digitalWrite(WEAPON_DIR_PIN, joystate.buttons & button_mask_right);
+    digitalWrite(WEAPON_EN_PIN, joystate.buttons & btn_weapon_enable);
+    analogWrite(WEAPON_DIR_PIN, joystate.speed_weapon);
 
     last_joystick_time = millis();
   }
@@ -185,7 +147,7 @@ void loop()
   {
     //Serial.println("No joystick data !");
     digitalWrite(WEAPON_EN_PIN, LOW);
-    digitalWrite(WEAPON_DIR_PIN, LOW);
+    analogWrite(WEAPON_DIR_PIN, 0);
     hoverserial_send(0, 0);
   }
  hoverserial_receive();

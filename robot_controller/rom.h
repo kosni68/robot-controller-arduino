@@ -8,6 +8,9 @@ void variable_default()
   PIN_joystick_speed = 15;
   PIN_joystick_steer = 14;
   PIN_buzzer = 3;
+  PIN_weapon_enable = 5;
+  PIN_weapon_speed = 17;
+  PIN_lcd_scroll = 4;
 
   inverse_speed = LOW;
   inverse_steer = LOW;
@@ -54,6 +57,15 @@ void save_eeprom()
 
   EEPROM.put(byte_position, PIN_buzzer);
   byte_position += sizeof(PIN_buzzer);
+
+  EEPROM.put(byte_position, PIN_weapon_enable);
+  byte_position += sizeof(PIN_weapon_enable);
+
+  EEPROM.put(byte_position, PIN_weapon_speed);
+  byte_position += sizeof(PIN_weapon_speed);
+
+  EEPROM.put(byte_position, PIN_lcd_scroll);
+  byte_position += sizeof(PIN_lcd_scroll);
 
   EEPROM.put(byte_position, inverse_speed);
   byte_position += sizeof(inverse_speed);
@@ -137,6 +149,15 @@ void read_eeprom()
 
   EEPROM.get(byte_position, PIN_buzzer);
   byte_position += sizeof(PIN_buzzer);
+
+  EEPROM.get(byte_position, PIN_weapon_enable);
+  byte_position += sizeof(PIN_weapon_enable);
+
+  EEPROM.get(byte_position, PIN_weapon_speed);
+  byte_position += sizeof(PIN_weapon_speed);
+
+  EEPROM.get(byte_position, PIN_lcd_scroll);
+  byte_position += sizeof(PIN_lcd_scroll);
 
   EEPROM.get(byte_position, inverse_speed);
   byte_position += sizeof(inverse_speed);

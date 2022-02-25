@@ -53,6 +53,10 @@ void setup_Lcd()
   lcd.print("Controller");
   lcd.setCursor(0, 1);
   lcd.print("init.");
+  lcd.setCursor(0, 2);
+  lcd.print("V");
+  lcd.setCursor(1, 2);
+  lcd.print(VERSION);
   lcd.createChar(BATTERY_0, battery_0);
   lcd.createChar(BATTERY_20, battery_20);
   lcd.createChar(BATTERY_40, battery_40);
@@ -60,18 +64,24 @@ void setup_Lcd()
   lcd.createChar(BATTERY_80, battery_80);
   lcd.createChar(BATTERY_100, battery_100);
 
-  lcd.setCursor(14, 0);
+  lcd.setCursor(19, 0);
   lcd.write(BATTERY_0);
-  lcd.setCursor(15, 0);
+  delay(250);
+  lcd.setCursor(19, 0);
   lcd.write(BATTERY_20);
-  lcd.setCursor(16, 0);
+  delay(200);
+  lcd.setCursor(19, 0);
   lcd.write(BATTERY_40);
-  lcd.setCursor(17, 0);
+  delay(200);
+  lcd.setCursor(19, 0);
   lcd.write(BATTERY_60);
-  lcd.setCursor(18, 0);
+  delay(200);
+  lcd.setCursor(19, 0);
   lcd.write(BATTERY_80);
+  delay(200);
   lcd.setCursor(19, 0);
   lcd.write(BATTERY_100);
+  delay(200);
 }
 
 String str_lcd(int var, byte size)
@@ -181,6 +191,16 @@ void print_lcd_pinout()
     lcd.setCursor(18, 2);
     lcd.print(ADDRESS_I2C_LCD, HEX);
 
+    lcd.setCursor(0, 3);
+    lcd.print("weapon EN:");
+    lcd.setCursor(10, 3);
+    lcd.print(PIN_lcd_scroll);
+
+    lcd.setCursor(13, 3);
+    lcd.print("ANA:");
+    lcd.setCursor(17, 3);
+    lcd.print(PIN_weapon_speed);
+
     last_mode_print_lcd = mode_print_lcd;
   }
 }
@@ -192,7 +212,7 @@ void print_lcd_cal_no_move()
   lcd.setCursor(5, 0);
   lcd.print("*********");
   lcd.setCursor(1, 1);
-  lcd.print("No move joystick");
+  lcd.print("Move deadzone");
   lcd.setCursor(5, 2);
   lcd.print("*********");
   last_mode_print_lcd = -1;
