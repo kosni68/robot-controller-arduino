@@ -13,4 +13,5 @@ the controller uses an i2c lcd screen for print joystick value and robot feedbac
 
 # TODO liste
 
-• deadzone parametrable
+• Rajouter version sur écran de démarrage
+Créer une animation décorative au démarrage aussi
