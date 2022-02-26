@@ -14,4 +14,7 @@ the controller uses an i2c lcd screen for print joystick value and robot feedbac
 # TODO liste
 
 • compte a rebour calibration
+• inverse steer speed a supprimer
+• enable weapon variation parametre
+• weapon speed a parametrer
 Créer une animation décorative au démarrage aussi

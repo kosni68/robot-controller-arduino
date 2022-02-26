@@ -16,18 +16,18 @@
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcd0";
-const byte nRF_joystick_address[6] = "EFgh1";
+const byte nRF_robot_address[6] = "ABcdSC";
+const byte nRF_joystick_address[6] = "EFghSC";
 
 #define HOVER_SERIAL_BAUD 115200 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
 #define SERIAL_BAUD 115200       // [-] Baud rate for built-in Serial (used for the Serial Monitor)
 #define START_FRAME 0xABCD       // [-] Start frme definition for reliable serial communication
 #define DEBUG_RX 1
 
-#define HOVER_SERIAL_RX_PIN A3 //ancienement 2
+#define HOVER_SERIAL_RX_PIN A3 // ancienement 2
 #define HOVER_SERIAL_TX_PIN 4
 
-#define WEAPON_EN_PIN 3
+#define WEAPON_SPEED_PIN 5
 #define WEAPON_DIR_PIN 6
 
 // https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
@@ -47,13 +47,13 @@ struct joystick_state
   byte speed_weapon;
 } joystate;
 
-#define btn_weapon_enable 0x01    //B00000001
-#define button_mask_right 0x02    //B00000010
-#define button_mask_down 0x04     //B00000100
-#define button_mask_left 0x08     //B00001000
-#define button_mask_start 0x10    //B00010000
-#define button_mask_select 0x20   //B00100000
-#define button_mask_joystick 0x40 //B01000000
+#define btn_weapon_enable 0x01    // B00000001
+#define button_mask_right 0x02    // B00000010
+#define button_mask_down 0x04     // B00000100
+#define button_mask_left 0x08     // B00001000
+#define button_mask_start 0x10    // B00010000
+#define button_mask_select 0x20   // B00100000
+#define button_mask_joystick 0x40 // B01000000
 
 SoftwareSerial HoverSerial(HOVER_SERIAL_RX_PIN, HOVER_SERIAL_TX_PIN);
 
@@ -103,7 +103,7 @@ static int32_t last_joystick_time = 0;
 
 void setup()
 {
-  pinMode(WEAPON_EN_PIN, OUTPUT);
+  pinMode(WEAPON_SPEED_PIN, OUTPUT);
   pinMode(WEAPON_DIR_PIN, OUTPUT);
 
   Serial.begin(SERIAL_BAUD);
@@ -135,22 +135,26 @@ void loop()
 
     hoverserial_send(joystate.steer, joystate.speed);
 
-    digitalWrite(WEAPON_EN_PIN, joystate.buttons & btn_weapon_enable);
-    analogWrite(WEAPON_DIR_PIN, joystate.speed_weapon);
+    if (joystate.buttons & btn_weapon_enable)
+    {
+      analogWrite(WEAPON_SPEED_PIN, joystate.speed_weapon);
+    }
+    else
+    {
+      analogWrite(WEAPON_SPEED_PIN, 0);
+    }
 
     last_joystick_time = millis();
   }
 
-
   /* Si l'on n'a pas reçu de message de la télécommande depuis plus de 500 ms */
   if (millis() - last_joystick_time > 500)
   {
-    //Serial.println("No joystick data !");
-    digitalWrite(WEAPON_EN_PIN, LOW);
-    analogWrite(WEAPON_DIR_PIN, 0);
+    // Serial.println("No joystick data !");
+    analogWrite(WEAPON_SPEED_PIN, 0);
     hoverserial_send(0, 0);
   }
- hoverserial_receive();
+  hoverserial_receive();
 
   /*Serial.print(F("temp loop ="));
   Serial.println(String(millis() - start_millis_loop));*/
