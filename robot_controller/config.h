@@ -32,6 +32,11 @@ void read_serial()
     {
       Serial.println(F("\n$# : Calibration automatique "));
 
+      Serial.println(F("\n***** end adress : *****"));
+      Serial.print(F("$0 : 2 character = "));
+      Serial.print(char(end_address[0]));
+      Serial.println(char(end_address[1]));
+
       Serial.println(F("\n***** PIN : *****"));
       Serial.print(F("$1 : PIN speed = "));
       Serial.println(PIN_joystick_speed);
@@ -181,6 +186,22 @@ void read_serial()
     }
     else
     {
+      if (mot_recu.indexOf("$0=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        end_address[0] = mot_recu[0];
+        Serial.print(F("end_address[0] :"));
+        Serial.println(char(end_address[0]));
+        end_address[1] = mot_recu[1];
+        Serial.print(F("end_address[1] :"));
+        Serial.println(char(end_address[1]));
+
+        Serial.println("RESTART");
+        save_eeprom();
+
+        delay(1000);
+        asm volatile ("  jmp 0");
+      }
       if (mot_recu.indexOf("$1=", 0) == 0)
       {
         mot_recu.remove(0, 3);

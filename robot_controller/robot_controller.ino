@@ -15,14 +15,16 @@
 // ***********************************************************************
 
 #define VERSION "2.0"
-#define value_to_init_eeprom 124 //change this value to erase default eeprom
+#define value_to_init_eeprom 174 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcd0";
-const byte nRF_joystick_address[6] = "EFgh1";
+byte nRF_robot_address[6] = "ABcd";
+byte nRF_joystick_address[6] = "EFgh";
+
+byte end_address[2];
 
 #define SERIAL_DEBUG LOW
 
@@ -137,6 +139,9 @@ void setup()
   scann_i2c();
 
   init_eeprom();
+
+  nRF_robot_address[4] = end_address[0];
+  nRF_robot_address[5] = end_address[1];
 
   setup_Lcd();
 

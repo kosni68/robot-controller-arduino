@@ -57,6 +57,13 @@ void setup_Lcd()
   lcd.print("V");
   lcd.setCursor(1, 2);
   lcd.print(VERSION);
+
+  lcd.setCursor(0, 3);
+  for (byte i = 0; i < 6; i++)
+  {
+    lcd.print(char(nRF_robot_address[i]));
+  }
+
   lcd.createChar(BATTERY_0, battery_0);
   lcd.createChar(BATTERY_20, battery_20);
   lcd.createChar(BATTERY_40, battery_40);
