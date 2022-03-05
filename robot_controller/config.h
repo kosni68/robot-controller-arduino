@@ -49,7 +49,7 @@ void read_serial()
       Serial.print(F("$5 : PIN Weapon speed = "));
       Serial.println(PIN_weapon_speed);
       Serial.print(F("$6 : PIN Weapon 2 enable = "));
-      Serial.println(PIN_weapon_enable);
+      Serial.println(PIN_weapon_enable_2);
       Serial.print(F("$7 : PIN lcd scroll = "));
       Serial.println(PIN_lcd_scroll);
       Serial.print(F("$8 : PIN speed inverse (0 = disable) = "));
