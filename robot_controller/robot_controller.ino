@@ -14,8 +14,8 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "2.0"
-#define value_to_init_eeprom 174 //change this value to erase default eeprom
+#define VERSION "2.2"
+#define value_to_init_eeprom 111 //change this value to erase default eeprom
 #define ADDRESS_I2C_LCD 0x26     //0x3F
 
 #define nRF_CE 9
@@ -24,7 +24,7 @@
 byte nRF_robot_address[6] = "ABcd";
 byte nRF_joystick_address[6] = "EFgh";
 
-byte end_address[2];
+byte end_address[2]= "yz";
 
 #define SERIAL_DEBUG LOW
 
@@ -34,9 +34,12 @@ byte end_address[2];
 
 byte PIN_joystick_speed;
 byte PIN_joystick_steer;
+byte PIN_speed_inverse;
+byte PIN_steer_inverse;
 byte PIN_buzzer;
 byte PIN_weapon_enable;
 byte PIN_weapon_speed;
+byte PIN_weapon_enable_2;
 byte PIN_lcd_scroll;
 
 bool serial_print = HIGH;
@@ -45,7 +48,6 @@ unsigned long last_ack_send_data_time = 0;
 
 bool inverse_speed = LOW;
 bool inverse_steer = LOW;
-bool inverse_send_speed_steer = LOW;
 
 int speed_scale;
 int steer_scale;
@@ -59,6 +61,9 @@ int joystick_speed_max;
 int joystick_steer_min;
 int joystick_steer_middle;
 int joystick_steer_max;
+int speed_weapon_read;
+int weapon_speed_min;
+int weapon_speed_max;
 
 bool correction_scale = LOW;
 
@@ -136,9 +141,11 @@ void setup()
   Serial.print(F("nRF24L01+ Joystick\nVersion : "));
   Serial.println(String(VERSION));
 
-  scann_i2c();
+  //scann_i2c();
 
   init_eeprom();
+
+  init_buzzer();
 
   nRF_robot_address[4] = end_address[0];
   nRF_robot_address[5] = end_address[1];
@@ -148,8 +155,6 @@ void setup()
   init_button();
 
   init_nrf(nRF_robot_address, nRF_joystick_address);
-
-  init_buzzer();
   
 }
 
@@ -165,7 +170,9 @@ void loop()
   read_serial();
   serial_print_pause();
   read_joystick();
-  joystate.speed_weapon_send = map(analogRead(PIN_weapon_speed),0,1023,0,255);
+  speed_weapon_read=analogRead(PIN_weapon_speed);
+  int speed_weapon_min_max = min_max(speed_weapon_read,weapon_speed_min,weapon_speed_max);
+  joystate.speed_weapon_send = map(speed_weapon_min_max,weapon_speed_min,weapon_speed_max,0,255);
   read_button();
   print_lcd();
 

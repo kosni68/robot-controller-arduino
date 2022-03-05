@@ -48,17 +48,21 @@ void read_serial()
       Serial.println(PIN_weapon_enable);
       Serial.print(F("$5 : PIN Weapon speed = "));
       Serial.println(PIN_weapon_speed);
-      Serial.print(F("$6 : PIN lcd scroll = "));
+      Serial.print(F("$6 : PIN Weapon 2 enable = "));
+      Serial.println(PIN_weapon_enable);
+      Serial.print(F("$7 : PIN lcd scroll = "));
       Serial.println(PIN_lcd_scroll);
+      Serial.print(F("$8 : PIN speed inverse (0 = disable) = "));
+      Serial.println(PIN_speed_inverse);
+      Serial.print(F("$9 : PIN steer inverse (0 = disable) = "));
+      Serial.println(PIN_steer_inverse);
 
       Serial.println(F("\n***** Enable/disable : *****"));
       Serial.print(F("$10 : inverse speed = "));
       Serial.println(inverse_speed);
       Serial.print(F("$11 : inverse steer = "));
       Serial.println(inverse_steer);
-      Serial.print(F("$12 : inverse send speed_steer = " ));
-      Serial.println(inverse_send_speed_steer);
-      Serial.print(F("$13 : enable correction scale = "));
+      Serial.print(F("$12 : enable correction scale = "));
       Serial.println(correction_scale);
 
       Serial.println(F("\n***** deadzone joystick : *****"));
@@ -108,8 +112,6 @@ void read_serial()
       Serial.print(F("\t"));
       Serial.println(y_speed[2]);
 
-
-
       Serial.println(F("\n***** Send curve value Steer : *****"));
       Serial.print(F("$41 : abscissa min = "));
       Serial.println(x_steer[0]);
@@ -136,6 +138,12 @@ void read_serial()
       Serial.print(y_steer[1]);
       Serial.print(F("\t"));
       Serial.println(y_steer[2]);
+
+      Serial.println(F("\n***** Analog read weapon speed : *****"));
+      Serial.print(F("$51 : speed value min = "));
+      Serial.println(weapon_speed_min);
+      Serial.print(F("$52 : speed value max = "));
+      Serial.println(weapon_speed_max);
 
       Serial.println(F("\n"));
     }
@@ -166,20 +174,10 @@ void read_serial()
     }
     else if (mot_recu == "$12=1")
     {
-      Serial.println(F("inverse_send_speed_steer HIGH\n\n"));
-      inverse_send_speed_steer = HIGH;
-    }
-    else if (mot_recu == "$12=0")
-    {
-      Serial.println(F("inverse_send_speed_steer LOW\n\n"));
-      inverse_send_speed_steer = LOW;
-    }
-    else if (mot_recu == "$13=1")
-    {
       Serial.println(F("correction_scale HIGH\n\n"));
       correction_scale = HIGH;
     }
-    else if (mot_recu == "$13=0")
+    else if (mot_recu == "$12=0")
     {
       Serial.println(F("correction_scale LOW\n\n"));
       correction_scale = LOW;
@@ -195,12 +193,8 @@ void read_serial()
         end_address[1] = mot_recu[1];
         Serial.print(F("end_address[1] :"));
         Serial.println(char(end_address[1]));
-
-        Serial.println("RESTART");
         save_eeprom();
-
-        delay(1000);
-        asm volatile ("  jmp 0");
+        soft_restart();
       }
       if (mot_recu.indexOf("$1=", 0) == 0)
       {
@@ -208,6 +202,8 @@ void read_serial()
         PIN_joystick_speed = mot_recu.toInt();
         Serial.print(F("PIN_joystick_speed :"));
         Serial.println(PIN_joystick_speed);
+        save_eeprom();
+        soft_restart();
       }
       else if (mot_recu.indexOf("$2=", 0) == 0)
       {
@@ -215,6 +211,8 @@ void read_serial()
         PIN_joystick_steer = mot_recu.toInt();
         Serial.print(F("PIN_joystick_steer :"));
         Serial.println(PIN_joystick_steer);
+        save_eeprom();
+        soft_restart();
       }
       else if (mot_recu.indexOf("$3=", 0) == 0)
       {
@@ -229,6 +227,8 @@ void read_serial()
         PIN_weapon_enable = mot_recu.toInt();
         Serial.print(F("PIN_weapon_enable :"));
         Serial.println(PIN_weapon_enable);
+        save_eeprom();
+        soft_restart();
       }
       else if (mot_recu.indexOf("$5=", 0) == 0)
       {
@@ -236,13 +236,44 @@ void read_serial()
         PIN_weapon_speed = mot_recu.toInt();
         Serial.print(F("PIN_weapon_speed :"));
         Serial.println(PIN_weapon_speed);
+        save_eeprom();
+        soft_restart();
       }
       else if (mot_recu.indexOf("$6=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_weapon_enable_2 = mot_recu.toInt();
+        Serial.print(F("PIN_weapon_enable_2 :"));
+        Serial.println(PIN_weapon_enable_2);
+        save_eeprom();
+        soft_restart();
+      }
+      else if (mot_recu.indexOf("$7=", 0) == 0)
       {
         mot_recu.remove(0, 3);
         PIN_lcd_scroll = mot_recu.toInt();
         Serial.print(F("PIN_lcd_scroll :"));
         Serial.println(PIN_lcd_scroll);
+        save_eeprom();
+        soft_restart();
+      }
+      else if (mot_recu.indexOf("$8=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_speed_inverse = mot_recu.toInt();
+        Serial.print(F("PIN_speed_inverse :"));
+        Serial.println(PIN_speed_inverse);
+        save_eeprom();
+        soft_restart();
+      }
+      else if (mot_recu.indexOf("$9=", 0) == 0)
+      {
+        mot_recu.remove(0, 3);
+        PIN_steer_inverse = mot_recu.toInt();
+        Serial.print(F("PIN_steer_inverse :"));
+        Serial.println(PIN_steer_inverse);
+        save_eeprom();
+        soft_restart();
       }
       else if (mot_recu.indexOf("$20=", 0) == 0)
       {
@@ -337,7 +368,6 @@ void read_serial()
         Serial.println(y_speed[2]);
       }
 
-
       else if (mot_recu.indexOf("$41=", 0) == 0)
       {
         mot_recu.remove(0, 4);
@@ -381,6 +411,20 @@ void read_serial()
         Serial.println(y_steer[2]);
       }
 
+      else if (mot_recu.indexOf("$51=", 0) == 0)
+      {
+        mot_recu.remove(0, 4);
+        weapon_speed_min = mot_recu.toInt();
+        Serial.print(F("weapon_speed_min :"));
+        Serial.println(weapon_speed_min);
+      }
+      else if (mot_recu.indexOf("$52=", 0) == 0)
+      {
+        mot_recu.remove(0, 4);
+        weapon_speed_max = mot_recu.toInt();
+        Serial.print(F("weapon_speed_max :"));
+        Serial.println(weapon_speed_max);
+      }
     }
     save_eeprom();
   }

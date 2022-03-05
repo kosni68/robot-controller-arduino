@@ -16,8 +16,8 @@
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcdSC";
-const byte nRF_joystick_address[6] = "EFghSC";
+const byte nRF_robot_address[6] = "ABcdFB";
+const byte nRF_joystick_address[6] = "EFghFB";
 
 #define HOVER_SERIAL_BAUD 115200 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
 #define SERIAL_BAUD 115200       // [-] Baud rate for built-in Serial (used for the Serial Monitor)
@@ -48,7 +48,7 @@ struct joystick_state
 } joystate;
 
 #define btn_weapon_enable 0x01    // B00000001
-#define button_mask_right 0x02    // B00000010
+#define btn_weapon_enable_2 0x02  // B00000010
 #define button_mask_down 0x04     // B00000100
 #define button_mask_left 0x08     // B00001000
 #define button_mask_start 0x10    // B00010000

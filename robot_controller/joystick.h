@@ -92,12 +92,6 @@ void read_joystick()
     Serial.println(joystate.steer_send);
   }
 
-  if (inverse_send_speed_steer)
-  {
-    int speed = joystate.speed_send;
-    joystate.speed_send = joystate.steer_send;
-    joystate.steer_send = speed;
-  }
 }
 
 // ***********************************************************************

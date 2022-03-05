@@ -5,19 +5,18 @@
 
 void variable_default()
 {
-  end_address[0] = "y";
-  end_address[1] = "z";
-
   PIN_joystick_speed = 15;
   PIN_joystick_steer = 14;
+  PIN_speed_inverse = 0;
+  PIN_steer_inverse = 0;
   PIN_buzzer = 3;
   PIN_weapon_enable = 5;
   PIN_weapon_speed = 17;
+  PIN_weapon_enable_2 = 6;
   PIN_lcd_scroll = 4;
 
   inverse_speed = LOW;
   inverse_steer = LOW;
-  inverse_send_speed_steer = LOW;
   correction_scale = HIGH;
 
   joystick_deadzone = 30;
@@ -45,6 +44,9 @@ void variable_default()
   y_steer[0] = 120;
   y_steer[1] = 300;
   y_steer[2] = 1000;
+
+  weapon_speed_min = 0;
+  weapon_speed_max = 1023;
 }
 
 void save_eeprom()
@@ -54,14 +56,20 @@ void save_eeprom()
   EEPROM.put(byte_position, end_address[0]);
   byte_position += sizeof(end_address[0]);
 
-  EEPROM.put(byte_position,  end_address[1]);
-  byte_position += sizeof( end_address[1]);
+  EEPROM.put(byte_position, end_address[1]);
+  byte_position += sizeof(end_address[1]);
 
   EEPROM.put(byte_position, PIN_joystick_speed);
   byte_position += sizeof(PIN_joystick_speed);
 
   EEPROM.put(byte_position, PIN_joystick_steer);
   byte_position += sizeof(PIN_joystick_steer);
+
+  EEPROM.put(byte_position, PIN_speed_inverse);
+  byte_position += sizeof(PIN_speed_inverse);
+
+  EEPROM.put(byte_position, PIN_steer_inverse);
+  byte_position += sizeof(PIN_steer_inverse);
 
   EEPROM.put(byte_position, PIN_buzzer);
   byte_position += sizeof(PIN_buzzer);
@@ -71,6 +79,9 @@ void save_eeprom()
 
   EEPROM.put(byte_position, PIN_weapon_speed);
   byte_position += sizeof(PIN_weapon_speed);
+
+  EEPROM.put(byte_position, PIN_weapon_enable_2);
+  byte_position += sizeof(PIN_weapon_enable_2);
 
   EEPROM.put(byte_position, PIN_lcd_scroll);
   byte_position += sizeof(PIN_lcd_scroll);
@@ -84,8 +95,6 @@ void save_eeprom()
   EEPROM.put(byte_position, correction_scale);
   byte_position += sizeof(correction_scale);
 
-  EEPROM.put(byte_position, inverse_send_speed_steer);
-  byte_position += sizeof(inverse_send_speed_steer);
 
   EEPROM.put(byte_position, joystick_deadzone);
   byte_position += sizeof(joystick_deadzone);
@@ -143,6 +152,12 @@ void save_eeprom()
 
   EEPROM.put(byte_position, y_steer[2]);
   byte_position += sizeof(y_steer[2]);
+  
+  EEPROM.put(byte_position, weapon_speed_min);
+  byte_position += sizeof(weapon_speed_min);
+
+  EEPROM.put(byte_position, weapon_speed_max);
+  byte_position += sizeof(weapon_speed_max);
 }
 
 void read_eeprom()
@@ -161,6 +176,12 @@ void read_eeprom()
   EEPROM.get(byte_position, PIN_joystick_steer);
   byte_position += sizeof(PIN_joystick_steer);
 
+  EEPROM.get(byte_position, PIN_speed_inverse);
+  byte_position += sizeof(PIN_speed_inverse);
+
+  EEPROM.get(byte_position, PIN_steer_inverse);
+  byte_position += sizeof(PIN_steer_inverse);
+
   EEPROM.get(byte_position, PIN_buzzer);
   byte_position += sizeof(PIN_buzzer);
 
@@ -169,6 +190,9 @@ void read_eeprom()
 
   EEPROM.get(byte_position, PIN_weapon_speed);
   byte_position += sizeof(PIN_weapon_speed);
+
+  EEPROM.get(byte_position, PIN_weapon_enable_2);
+  byte_position += sizeof(PIN_weapon_enable_2);
 
   EEPROM.get(byte_position, PIN_lcd_scroll);
   byte_position += sizeof(PIN_lcd_scroll);
@@ -181,9 +205,6 @@ void read_eeprom()
 
   EEPROM.get(byte_position, correction_scale);
   byte_position += sizeof(correction_scale);
-
-  EEPROM.get(byte_position, inverse_send_speed_steer);
-  byte_position += sizeof(inverse_send_speed_steer);
 
   EEPROM.get(byte_position, joystick_speed_min);
   byte_position += sizeof(joystick_speed_min);
@@ -241,6 +262,12 @@ void read_eeprom()
 
   EEPROM.get(byte_position, y_steer[2]);
   byte_position += sizeof(y_steer[2]);
+
+  EEPROM.get(byte_position, weapon_speed_min);
+  byte_position += sizeof(weapon_speed_min);
+
+  EEPROM.get(byte_position, weapon_speed_max);
+  byte_position += sizeof(weapon_speed_max);
 }
 
 void init_eeprom()

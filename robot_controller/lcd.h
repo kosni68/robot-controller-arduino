@@ -71,7 +71,7 @@ void setup_Lcd()
   lcd.createChar(BATTERY_80, battery_80);
   lcd.createChar(BATTERY_100, battery_100);
 
-  lcd.setCursor(19, 0);
+  /*lcd.setCursor(19, 0);
   lcd.write(BATTERY_0);
   delay(250);
   lcd.setCursor(19, 0);
@@ -85,10 +85,10 @@ void setup_Lcd()
   delay(200);
   lcd.setCursor(19, 0);
   lcd.write(BATTERY_80);
-  delay(200);
+  delay(200);*/
   lcd.setCursor(19, 0);
   lcd.write(BATTERY_100);
-  delay(200);
+  //delay(200);
 }
 
 String str_lcd(int var, byte size)
@@ -175,23 +175,40 @@ void print_lcd_weapon()
     lcd.clear();
     lcd.backlight();
     lcd.setCursor(0, 0);
-    lcd.print("Weapon");
+    lcd.print("Weapon pin:");
+    lcd.setCursor(12, 0);
+    lcd.print(PIN_weapon_enable);
+    lcd.setCursor(17, 0);
+    lcd.print(PIN_weapon_enable_2);
     lcd.setCursor(0, 1);
     lcd.print("Enable:");
     lcd.setCursor(0, 2);
-    lcd.print("Speed:");
+    lcd.print("read pin ");
+    lcd.print(PIN_weapon_speed);
+    lcd.print(":");
+    lcd.setCursor(0, 3);
+    lcd.print("send:");
 
     last_mode_print_lcd = mode_print_lcd;
   }
 
-  lcd.setCursor(9, 1);
+  lcd.setCursor(11, 1);
   if (joystate.buttons & btn_weapon_enable)
     lcd.print("HIGH");
   else
     lcd.print("LOW ");
 
-  lcd.setCursor(8, 2);
-  lcd.print(str_lcd(joystate.speed_weapon_send, 3));
+  lcd.setCursor(16, 1);
+  if (joystate.buttons & btn_weapon_enable_2)
+    lcd.print("HIGH");
+  else
+    lcd.print("LOW ");
+
+  lcd.setCursor(13, 2);
+  lcd.print(str_lcd(speed_weapon_read, 4));
+
+  lcd.setCursor(6, 3);
+  lcd.print(str_lcd(joystate.speed_weapon_send, 4));
 }
 
 void print_lcd_pinout()
@@ -205,34 +222,24 @@ void print_lcd_pinout()
     lcd.print("Pin :");
 
     lcd.setCursor(0, 1);
-    lcd.print("Speed:");
-    lcd.setCursor(7, 1);
+    lcd.print("Speed: ");
     lcd.print(PIN_joystick_speed);
 
     lcd.setCursor(11, 1);
-    lcd.print("Steer:");
-    lcd.setCursor(18, 1);
+    lcd.print("Steer: ");
     lcd.print(PIN_joystick_steer);
 
     lcd.setCursor(0, 2);
-    lcd.print("Buzzer:");
-    lcd.setCursor(8, 2);
+    lcd.print("Buzzer: ");
     lcd.print(PIN_buzzer);
 
     lcd.setCursor(11, 2);
     lcd.print("Lcd: 0x");
-    lcd.setCursor(18, 2);
     lcd.print(ADDRESS_I2C_LCD, HEX);
 
     lcd.setCursor(0, 3);
-    lcd.print("weapon EN:");
-    lcd.setCursor(10, 3);
+    lcd.print("LCD scroll: ");
     lcd.print(PIN_lcd_scroll);
-
-    lcd.setCursor(13, 3);
-    lcd.print("ANA:");
-    lcd.setCursor(17, 3);
-    lcd.print(PIN_weapon_speed);
 
     last_mode_print_lcd = mode_print_lcd;
   }
