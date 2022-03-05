@@ -12,7 +12,7 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define nRF_CE 9
 #define nRF_CSn 10
 
@@ -28,7 +28,7 @@ const byte nRF_joystick_address[6] = "EFghFB";
 #define HOVER_SERIAL_TX_PIN 4
 
 #define WEAPON_SPEED_PIN 5
-#define WEAPON_DIR_PIN 6
+#define WEAPON_2_PIN 6
 
 // https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC
 
@@ -104,7 +104,7 @@ static int32_t last_joystick_time = 0;
 void setup()
 {
   pinMode(WEAPON_SPEED_PIN, OUTPUT);
-  pinMode(WEAPON_DIR_PIN, OUTPUT);
+  pinMode(WEAPON_2_PIN, OUTPUT);
 
   Serial.begin(SERIAL_BAUD);
   Serial.print(F("nRF24L01+ Robot\nVersion : "));
@@ -142,6 +142,15 @@ void loop()
     else
     {
       analogWrite(WEAPON_SPEED_PIN, 0);
+    }
+
+    if (joystate.buttons & btn_weapon_enable_2)
+    {
+      digitalWrite(WEAPON_2_PIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(WEAPON_2_PIN, LOW);
     }
 
     last_joystick_time = millis();
