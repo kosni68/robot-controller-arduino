@@ -65,4 +65,15 @@ void read_button()
             joystate.steer_send = -joystate.steer_send;
         }
     }
+
+    if (PIN_weapon_speed > 0)
+    {
+        speed_weapon_read = analogRead(PIN_weapon_speed);
+        int speed_weapon_min_max = min_max(speed_weapon_read, weapon_speed_min, weapon_speed_max);
+        joystate.speed_weapon_send = map(speed_weapon_min_max, weapon_speed_min, weapon_speed_max, 0, 255);
+    }
+    else
+    {
+        joystate.speed_weapon_send = 255;
+    }
 }

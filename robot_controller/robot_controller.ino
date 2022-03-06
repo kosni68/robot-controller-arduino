@@ -14,9 +14,9 @@
 // ************************     CONSTANTES    ****************************
 // ***********************************************************************
 
-#define VERSION "2.2"
-#define value_to_init_eeprom 111 //change this value to erase default eeprom
-#define ADDRESS_I2C_LCD 0x26     //0x3F
+#define VERSION "2.3"
+#define value_to_init_eeprom 111 // change this value to erase default eeprom
+#define ADDRESS_I2C_LCD 0x26     // 0x3F
 
 #define nRF_CE 9
 #define nRF_CSn 10
@@ -24,7 +24,7 @@
 byte nRF_robot_address[6] = "ABcd";
 byte nRF_joystick_address[6] = "EFgh";
 
-byte end_address[2]= "yz";
+byte end_address[2] = "yz";
 
 #define SERIAL_DEBUG LOW
 
@@ -115,7 +115,6 @@ int y_speed[3];
 int x_steer[3];
 int y_steer[3];
 
-
 // ***********************************************************************
 // ****************   Inclusion des sous programmes   ********************
 // ***********************************************************************
@@ -141,7 +140,7 @@ void setup()
   Serial.print(F("nRF24L01+ Joystick\nVersion : "));
   Serial.println(String(VERSION));
 
-  //scann_i2c();
+  // scann_i2c();
 
   init_eeprom();
 
@@ -155,7 +154,6 @@ void setup()
   init_button();
 
   init_nrf(nRF_robot_address, nRF_joystick_address);
-  
 }
 
 // ***********************************************************************
@@ -170,9 +168,6 @@ void loop()
   read_serial();
   serial_print_pause();
   read_joystick();
-  speed_weapon_read=analogRead(PIN_weapon_speed);
-  int speed_weapon_min_max = min_max(speed_weapon_read,weapon_speed_min,weapon_speed_max);
-  joystate.speed_weapon_send = map(speed_weapon_min_max,weapon_speed_min,weapon_speed_max,0,255);
   read_button();
   print_lcd();
 
@@ -180,7 +175,7 @@ void loop()
   {
     if (millis() - last_ack_send_data_time > 200)
     {
-      bip_buzzer(1200,200);
+      bip_buzzer(1200, 200);
     }
   }
   else

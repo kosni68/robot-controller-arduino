@@ -13,7 +13,5 @@ the controller uses an i2c lcd screen for print joystick value and robot feedbac
 
 # TODO liste
 
-* créer un weapon2 ou pin de sens d'arme (led bleu sur le récepteur câblé sur le pin6)
-* créer une calibration sur le potentometre de vitesse d'arme
-• compte a rebour calibration
+* compte a rebour calibration
 * Désactivation arme = 255
