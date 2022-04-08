@@ -16,8 +16,8 @@
 #define nRF_CE 9
 #define nRF_CSn 10
 
-const byte nRF_robot_address[6] = "ABcdFB";
-const byte nRF_joystick_address[6] = "EFghFB";
+const byte nRF_robot_address[6] = "ABcdSB";
+const byte nRF_joystick_address[6] = "EFghSB";
 
 #define HOVER_SERIAL_BAUD 115200 // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
 #define SERIAL_BAUD 115200       // [-] Baud rate for built-in Serial (used for the Serial Monitor)
